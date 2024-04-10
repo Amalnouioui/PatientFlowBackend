@@ -111,7 +111,10 @@ public class PatientServiceImpl implements PatientService {
     public List<Patient> searchPatientsByGender(Gender gender) {
         return patientRepository.findByPatientGender(gender);
     }
-	
+    @Override
+    public List<Patient>searchPatientByFullConditions(String patientFirstName, String patientLastName, Gender patientGender,Date DOB){
+        return patientRepository.findByPatientFirstNameAndPatientLastNameAndPatientGenderAndPatientBirthDate(patientFirstName,patientLastName,patientGender,DOB);
+    }
 	
 
 }

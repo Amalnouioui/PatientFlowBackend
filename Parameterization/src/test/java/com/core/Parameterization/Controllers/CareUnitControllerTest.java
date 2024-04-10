@@ -58,19 +58,19 @@ class CareUnitControllerTest {
         careUnit.setCareunitDescription("neww careunit for test");
         careUnit.setCareunitResponsable("Doc ahmed");
         careUnit.setCareunitCapacity(5);
-        careUnit.setCareuniType(UnitType.Cherugie);
+        careUnit.setCareuniType(UnitType.Intensifs);
         careUnit.setCareunitStatue(UnitStatus.InACTIVE);
         long currentTimeMillis = System.currentTimeMillis();
         careUnit.setCareUnit_StartTime(new Timestamp(currentTimeMillis));
         careUnit.setCareUnit_EndTime(new Timestamp(currentTimeMillis));
         // Initialisation des identifiants d'équipements et de services
         careUnit.setEquipmentList(new ArrayList<>());
-        careUnit.setServiceList(new ArrayList<>());
+       // careUnit.setServiceList(new ArrayList<>());
         List<Long> equipmentIds = Arrays.asList(1L, 3L);
         List<Long> serviceIds = Arrays.asList(1L, 2L, 3L);
 
         careUnit.setEquipmentList(equipmentIds);
-        careUnit.setServiceList(serviceIds);
+      //  careUnit.setServiceList(serviceIds);
        // careUnit.setRooms(roomList);
 
         room.setRoomName(103);
@@ -83,7 +83,7 @@ class CareUnitControllerTest {
         bed.setBedKey(10);
         bed.setBedNumber(101);
         bed.setBedDescription("new bed  ");
-        bed.setBedType(BedType.Double);
+        bed.setBedType(BedType.Simple);
         bed.setBedStatue(BedStatus.En_Maintenance);
         bed.setPoids(80);
         bed.setPhysicalState(BedPhysicalCondition.Bon_Etat);
@@ -200,7 +200,7 @@ class CareUnitControllerTest {
         bed.setBedKey(10);
         bed.setBedNumber(101);
         bed.setBedDescription("new bed  ");
-        bed.setBedType(BedType.Double);
+        bed.setBedType(BedType.Simple);
         bed.setBedStatue(BedStatus.En_Maintenance);
         bed.setPoids(80);
         bed.setPhysicalState(BedPhysicalCondition.Bon_Etat);

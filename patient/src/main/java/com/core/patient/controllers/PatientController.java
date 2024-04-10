@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -98,9 +99,17 @@ public class PatientController {
 	        List<Patient> patients = patientService.searchPatientsByGender(gender);
 	        return new ResponseEntity<>(patients, HttpStatus.OK);
 	    }
-	 
-	
-	
-	
+
+
+
+	@GetMapping("/search/fullNameDOBSexe")
+	public ResponseEntity<List<Patient>> searchPatientbyFullNameDOBAndSexe(
+			@RequestParam(name = "patientFirstName", required = true) String patientFirstName,
+			@RequestParam(name = "patientLastName", required = true) String patientLastName,
+			@RequestParam(name = "patientGender", required = true) Gender patientGender,
+			@RequestParam(name = "patientBirthDate", required = true)  @DateTimeFormat(pattern = "yyyy-MM-dd") Date patientBirthDate){
+		List<Patient> patients = patientService.searchPatientByFullConditions(patientFirstName, patientLastName,patientGender,patientBirthDate);
+		return new ResponseEntity<>(patients, HttpStatus.OK);
+	}
 
 }

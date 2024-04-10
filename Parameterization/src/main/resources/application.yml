@@ -15,9 +15,9 @@ spring:
     import: optional:configserver:http://localhost:8888
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/iss4ubackoff
+    url: jdbc:mysql://localhost:3306/newbd
     username: root
-    password: 
+    password: root
   jpa:
     hibernate:
       ddl-auto: update

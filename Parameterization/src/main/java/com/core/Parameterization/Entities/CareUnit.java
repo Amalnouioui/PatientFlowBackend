@@ -3,6 +3,7 @@ package com.core.Parameterization.Entities;
 import com.core.Parameterization.Entities.Enumeration.UnitStatus;
 import com.core.Parameterization.Entities.Enumeration.UnitType;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
@@ -69,10 +70,6 @@ public class CareUnit {
     @JsonIgnore
     private List<Long> equipmentList;
 
-    @Transient
-    @JsonIgnore
-    private List<Long> serviceList;
-
 
     @JsonIgnore
     @Transient
@@ -80,9 +77,7 @@ public class CareUnit {
 
 
 
-    @JsonIgnore
-    @Transient
-    private List<Long>deletedServiceIds;
+
 
 
     //@JsonIgnore
@@ -90,11 +85,19 @@ public class CareUnit {
     @OneToMany(mappedBy = "careUnit",cascade = CascadeType.ALL)
     Set<CareUnitEquipLink> careUnitEquipLinkSet;
 
-    //  @JsonIgnore
-    @OneToMany(mappedBy = "careUnit",cascade = CascadeType.ALL)
-    Set<CareUnitServiceLink>careUnitServiceLinkSet;
+    @ManyToOne
+    @JoinColumn(name = "Service_Ref", referencedColumnName = "Service_Ky")
+    @JsonIdentityReference(alwaysAsId = true)
+    private  ServiceEntity serviceCareunits;
 
 
+    public ServiceEntity getServiceCareunits() {
+        return serviceCareunits;
+    }
+
+    public void setServiceCareunits(ServiceEntity serviceCareunits) {
+        this.serviceCareunits = serviceCareunits;
+    }
 
     @OneToMany(mappedBy = "careunitRoom",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<Room>rooms;
@@ -199,13 +202,7 @@ public class CareUnit {
         return careUnitEquipLinkSet;
     }
 
-    public Set<CareUnitServiceLink> getCareUnitServiceLinkSet() {
-        return careUnitServiceLinkSet;
-    }
 
-    public void setCareUnitServiceLinkSet(Set<CareUnitServiceLink> careUnitServiceLinkSet) {
-        this.careUnitServiceLinkSet = careUnitServiceLinkSet;
-    }
 
     public String getCareunitName() {
         return careunitName;
@@ -234,13 +231,6 @@ public class CareUnit {
         this.equipmentList = equipmentList;
     }
 
-    public List<Long> getServiceList() {
-        return serviceList;
-    }
-
-    public void setServiceList(List<Long> serviceList) {
-        this.serviceList = serviceList;
-    }
 
     public List<Long> getDeletedEquipmentIds() {
         return deletedEquipmentIds;
@@ -250,11 +240,5 @@ public class CareUnit {
         this.deletedEquipmentIds = deletedEquipmentIds;
     }
 
-    public List<Long> getDeletedServiceIds() {
-        return deletedServiceIds;
-    }
 
-    public void setDeletedServiceIds(List<Long> deletedServiceIds) {
-        this.deletedServiceIds = deletedServiceIds;
-    }
 }

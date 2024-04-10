@@ -53,24 +53,24 @@ class RoomControllerTest {
             careUnit.setCareunitDescription("neww careunit for test");
             careUnit.setCareunitResponsable("Doc imed");
             careUnit.setCareunitCapacity(5);
-            careUnit.setCareuniType(UnitType.Cherugie);
+            careUnit.setCareuniType(UnitType.Intermediaires);
             careUnit.setCareunitStatue(UnitStatus.InACTIVE);
             long currentTimeMillis = System.currentTimeMillis();
             careUnit.setCareUnit_StartTime(new Timestamp(currentTimeMillis));
             careUnit.setCareUnit_EndTime(new Timestamp(currentTimeMillis));
             // Initialisation des identifiants d'équipements et de services
             careUnit.setEquipmentList(new ArrayList<>());
-            careUnit.setServiceList(new ArrayList<>());
+         //   careUnit.setServiceList(new ArrayList<>());
             List<Long> equipmentIds = Arrays.asList(1L, 3L);
             List<Long> serviceIds = Arrays.asList(1L, 2L, 3L);
             careUnit.setEquipmentList(equipmentIds);
-            careUnit.setServiceList(serviceIds);
+           // careUnit.setServiceList(serviceIds);
 
             //bed
             bed.setBedKey(10);
             bed.setBedNumber(101);
             bed.setBedDescription("new bed  ");
-            bed.setBedType(BedType.Double);
+            bed.setBedType(BedType.Simple);
             bed.setBedStatue(BedStatus.En_Maintenance);
             bed.setPoids(80);
             bed.setPhysicalState(BedPhysicalCondition.Bon_Etat);
@@ -99,18 +99,18 @@ class RoomControllerTest {
             careunitToAdd.setCareunitDescription("neww careunit for test");
             careunitToAdd.setCareunitResponsable("Doc imed");
             careunitToAdd.setCareunitCapacity(5);
-            careunitToAdd.setCareuniType(UnitType.Cherugie);
+            careunitToAdd.setCareuniType(UnitType.Intensifs);
             careunitToAdd.setCareunitStatue(UnitStatus.InACTIVE);
             long currentTimeMillis = System.currentTimeMillis();
             careunitToAdd.setCareUnit_StartTime(new Timestamp(currentTimeMillis));
             careunitToAdd.setCareUnit_EndTime(new Timestamp(currentTimeMillis));
             // Initialisation des identifiants d'équipements et de services
             careunitToAdd.setEquipmentList(new ArrayList<>());
-            careunitToAdd.setServiceList(new ArrayList<>());
+            //areunitToAdd.setServiceList(new ArrayList<>());
             List<Long> equipmentIds = Arrays.asList(1L, 3L);
             List<Long> serviceIds = Arrays.asList(1L, 2L, 3L);
             careunitToAdd.setEquipmentList(equipmentIds);
-            careunitToAdd.setServiceList(serviceIds);
+           // careunitToAdd.setServiceList(serviceIds);
 
             room.setCareunitRoom(careunitToAdd);
 

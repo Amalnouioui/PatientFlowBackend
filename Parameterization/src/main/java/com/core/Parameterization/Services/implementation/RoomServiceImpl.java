@@ -41,8 +41,8 @@ import java.util.*;
             if (iRoom.getRoomType() == RoomType.Simple && aRoomCapacity != 1) {
                 throw new IllegalStateException("La capacité d'une chambre simple doit être de 1");
             }
-             else if (iRoom.getRoomType() == RoomType.Double && aRoomCapacity != 2 && aRoomCapacity != 1) {
-                throw new IllegalStateException("La capacité d'une chambre double doit être de 1 ou 2");
+            else if (iRoom.getRoomType() == RoomType.Double && aRoomCapacity != 2 ) {
+                throw new IllegalStateException("La capacité d'une chambre double doit être de 2");
             }
             else if (iRoom.getRoomType() == RoomType.COLLECTIVE && aRoomCapacity < 3) {
                 throw new IllegalStateException("La capacité d'une chambre collective doit être d'au moins 3");
@@ -160,60 +160,7 @@ import java.util.*;
     }
 
 
-    /*@Override
-    public  void updateRoom(Room iRoom){
-        Room aExistingRoom=roomRepository.findById(iRoom.getRoomKey()).orElse(null);
 
-        List<Bed>aBedList=iRoom.getRoomBed();
-        int aRoomCapacity=iRoom.getRoomCapacity();
-        for( Bed abed : aBedList){
-            if(abed.getBedType()==BedType.Simple || abed.getBedType()==BedType.Medicalise ) {
-                if (iRoom.getRoomType() == RoomType.Simple && aRoomCapacity != 1) {
-
-                    throw new IllegalStateException("Echec de mettre a jour la chambre , la capacité d'une chambre simple ou mediclaisé doit etre 1 !");
-
-                }  if (iRoom.getRoomType() == RoomType.Double && aRoomCapacity != 2) {
-                    throw new IllegalStateException("Echec de mettre ajour la chambre , la capacité d'une chambre double qui contient déja un lit simple ou medicalisé doit etre 2 !");
-                }
-            }else if (abed.getBedType()==BedType.Double){
-                if(iRoom.getRoomType()==RoomType.Double && aRoomCapacity!=1){
-                    throw new IllegalStateException("Echec de mettre a jour la chambre , la capacité d'une chambre double qui contient un lit double doit etre 1 !");
-
-                } if (iRoom.getRoomType()==RoomType.Simple &aRoomCapacity!=1){
-                    throw new IllegalStateException("Echec de mettre a jour la chambre ,la chambre ne peut pas etre de type simple car elle contient un lit double ! ");
-                }
-            }else if(iRoom.getRoomType()==RoomType.Simple && aRoomCapacity!=1 && aBedList.isEmpty()){
-
-                throw new IllegalStateException("la capacité d'une chambre simple doit etre 1 ");
-
-            }else if(iRoom.getRoomType()==RoomType.Double && aRoomCapacity!=2 && aRoomCapacity!=1 && aBedList.isEmpty()){
-                throw new IllegalStateException("la capacité d'une chambre doit etre 2");
-            }
-        }
-
-        if (aExistingRoom != null) {
-            Room aRoomName=roomRepository.findRoomByRoomName(iRoom.getRoomName());
-            if((aRoomName!=null)&&!aRoomName.getRoomKey().equals(aExistingRoom.getRoomKey())){
-                throw new IllegalStateException("Le nom du chambre déja existe , donner un nom unique !");
-
-            }else {
-                aExistingRoom.setRoomName(iRoom.getRoomName());
-                aExistingRoom.setRoomCapacity(iRoom.getRoomCapacity());
-                aExistingRoom.setRoomStatue(iRoom.getRoomStatue());
-                aExistingRoom.setRoomType(iRoom.getRoomType());
-                aExistingRoom.setCleaningState(iRoom.getCleaningState());
-                aExistingRoom.setCareunitRoom(iRoom.getCareunitRoom());
-                aExistingRoom.setRoomResponsible(iRoom.getRoomResponsible());
-                roomRepository.save(aExistingRoom);
-            }
-
-        }
-        else {
-            throw new IllegalStateException("Aucune chambre existe avec cet ID !"); // or handle as appropriate
-        }
-
-    }
-*/
 
     @Override
     public void updateRoom(Room iRoom) {
@@ -223,27 +170,16 @@ import java.util.*;
             List<Bed> aBedList = iRoom.getRoomBed();
             int aRoomCapacity = iRoom.getRoomCapacity();
 
-            boolean hasDoubleBed = false;
 
-            for (Bed bed : aBedList) {
-                if (bed.getBedType() == BedType.Double) {
-                    hasDoubleBed = true;
-                }
-            }
 
             if (iRoom.getRoomType() == RoomType.Simple && aRoomCapacity != 1) {
                 throw new IllegalStateException("Echec de mettre à jour la chambre, la capacité d'une chambre simple ou medicalisée doit être 1 !");
-            } else if (iRoom.getRoomType() == RoomType.Double && aRoomCapacity != 2 && !hasDoubleBed) {
-                throw new IllegalStateException("Echec de mettre à jour la chambre, la capacité d'une chambre double qui contient déjà un lit simple ou medicalisé doit être 2 !");
-            }else if (iRoom.getRoomType() == RoomType.Double && aRoomCapacity != 1 && hasDoubleBed){
-                throw new IllegalStateException("Echec de mettre a jour la capacité d'un chambre double qui contient un lit double doit etre 1 !");
+            } else if (iRoom.getRoomType() == RoomType.Double && aRoomCapacity != 2 ) {
+                throw new IllegalStateException("Echec de mettre à jour la chambre, la capacité d'une chambre double  doit être 2 !");
             }
-            else if (iRoom.getRoomType() == RoomType.Simple && aRoomCapacity == 1 && hasDoubleBed) {
-                throw new IllegalStateException("Echec de mettre à jour la chambre, la chambre ne peut pas être de type simple car elle contient un lit double !");
-            } else if (iRoom.getRoomType() == RoomType.COLLECTIVE && aRoomCapacity < 3) {
-                throw new IllegalStateException("Echec de mettre à jour la chambre collective inferieur a 3 !");
-            } 
-
+            else if (iRoom.getRoomType() == RoomType.COLLECTIVE && aRoomCapacity <3) {
+                throw new IllegalStateException("Echec de mettre à jour la chambre, une chambre collective de capacité 2 doit contenir minimum 3");
+            }
             else {
                 Room aRoomName = roomRepository.findRoomByRoomName(iRoom.getRoomName());
                 if ((aRoomName != null) && !aRoomName.getRoomKey().equals(aExistingRoom.getRoomKey())) {
@@ -264,5 +200,7 @@ import java.util.*;
             throw new IllegalStateException("Aucune chambre existe avec cet ID !");
         }
     }
+
+
 
 }

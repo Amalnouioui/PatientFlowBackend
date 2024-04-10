@@ -46,35 +46,13 @@ public class BedServiceImpl implements BedService {
             List<Bed> aBedList = aRoom.getRoomBed();
             int aRoomCapacity = aRoom.getRoomCapacity();
 
-            // Vérification du type de chambre et des contraintes sur les lits
-            if (aRoom.getRoomType() == RoomType.Simple && aRoomCapacity==1) {
-                if(iBed.getBedType()==BedType.Double){
-                    throw new IllegalStateException("Echec d'ajouter un lit double , la chambre est de type simple !");
-                }
-
-            } else if (aRoom.getRoomType() == RoomType.Double && aRoomCapacity==2) {
-                if(iBed.getBedType()==BedType.Double){
-                    throw new IllegalStateException("Echec d'ajouter un lit double , la capacité du chambre doit etre 1");
-                }
-            }
-            else if (aRoom.getRoomType()==RoomType.Double && aRoomCapacity==1){
-                if (iBed.getBedType()== BedType.Simple) {
-                    throw new IllegalStateException("Echec d'ajouter un lit simple , la capacité du chambre doit etre 2 ");
-
-                }
-                if (iBed.getBedType()==BedType.Medicalise){
-                    throw new IllegalStateException("Echec d'ajouter un lit  medicalisé  , la capacité du chambre doit etre 2 ");
-                }
-                // Vérification du type de chambre et des contraintes sur les lits
 
 
-            }
-           else if (aRoom.getRoomType() == RoomType.COLLECTIVE && aRoomCapacity < 3 && iBed.getBedType() == BedType.Simple) {
+
+            if (aRoom.getRoomType() == RoomType.COLLECTIVE && aRoomCapacity < 3 && iBed.getBedType() == BedType.Simple && iBed.getBedType() == BedType.Medicalise) {
                 throw new IllegalStateException("Impossible d'ajouter un lit simple dans une chambre collective avec une capacité inférieure à 3");
             }
-           else if (aRoom.getRoomType() == RoomType.COLLECTIVE && iBed.getBedType() == BedType.Double) {
-               throw new IllegalStateException("Impossible d'ajouter un lit double dans une chambre collective ");
-           }
+
             if (aBedList.size() >= aRoomCapacity) {
                 throw new IllegalStateException("La chambre "+aRoom.getRoomName()+" est pleine !");
             }
@@ -109,24 +87,8 @@ public class BedServiceImpl implements BedService {
         Bed aExistingBed = bedRespository.findById(iBedKey).orElseThrow(() -> new EntityNotFoundException("Aucun lit existe avec cet ID"));
         Room aRoomBed =aExistingBed.getRoomBed() ;
         int aRoomCapacity = aRoomBed.getRoomCapacity();
-        if (aRoomBed.getRoomType() == RoomType.Simple && aRoomCapacity == 1) {
-            if (iUpdatedBed.getBedType() == BedType.Double) {
-                throw new IllegalStateException("Impossible de mettre à jour un lit de type Simple en un lit de type Double dans une chambre de type Simple de capacité 1 !");
-            }
-        } else if (aRoomBed.getRoomType() == RoomType.Double && aRoomCapacity == 1) {
-            if (iUpdatedBed.getBedType() == BedType.Simple || iUpdatedBed.getBedType() == BedType.Medicalise) {
-                throw new IllegalStateException("Impossible de mettre à jour un lit Simple ou Medicalisé dans une chambre de type Double de capacité 1 !");
-            }
-        } else if (aRoomBed.getRoomType() == RoomType.Double && aRoomCapacity == 2) {
-            if (iUpdatedBed.getBedType() == BedType.Double) {
-                throw new IllegalStateException("Impossible de mettre à jour un lit de type Double dans une chambre de type Double de capacité 2 !");
-            }
-        
-    } else if (aRoomBed.getRoomType() == RoomType.COLLECTIVE ) {
-        if (iUpdatedBed.getBedType() == BedType.Double) {
-            throw new IllegalStateException("Impossible de mettre à jour un lit de type Double dans une chambre de type collective !");
-        }
-    }
+
+
         // Check if the new bed number is already used in the room
         Bed aBedWithSameNumberInRoom = bedRespository.findByBedNumberAndRoomBed(iUpdatedBed.getBedNumber(), aExistingBed.getRoomBed());
         if (aBedWithSameNumberInRoom != null && !aBedWithSameNumberInRoom.getBedKey().equals(aExistingBed.getBedKey())) {

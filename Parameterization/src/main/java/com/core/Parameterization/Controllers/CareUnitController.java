@@ -4,6 +4,7 @@ package com.core.Parameterization.Controllers;
 import aj.org.objectweb.asm.TypeReference;
 import com.core.Parameterization.Entities.*;
 import com.core.Parameterization.Entities.Enumeration.RoomStatus;
+import com.core.Parameterization.Entities.Enumeration.ServiceType;
 import com.core.Parameterization.Entities.Enumeration.UnitStatus;
 import com.core.Parameterization.Entities.Enumeration.UnitType;
 import com.core.Parameterization.Respositories.CareUnitServiceLinkRepo;
@@ -34,7 +35,6 @@ public class CareUnitController {
     @Autowired
     private CareUnitServiceLinkService careUnitServiceLinkService;
 
-
     //ADD EQUIPMENT AND SERVICE TO CAREUNIT WHEN ADDING NEW CAREUNIT
     @PostMapping
 
@@ -48,10 +48,11 @@ public class CareUnitController {
 
             // Extraire les IDs des équipements du JSON
             List<Long> aEquipmentList = extractEquipmentIdsFromJson(iRequestBody);
-            List<Long> aServiceList = extractServiceIdsFromJson(iRequestBody);
+
+
 
             // Ajouter les équipements à l'unité de soin
-            addEquipmentsAndServicesToCareUnit(aCareUnit, aEquipmentList, aServiceList);
+            addEquipmentToCareUnit(aCareUnit, aEquipmentList);
 
             return  ("l'unité de soin a été ajouté avec succées");
         }catch(Exception e){
@@ -77,55 +78,33 @@ public class CareUnitController {
         }
 
     }
-    //EXTRACT THE SERVICE LIST  FROM THE BODY
-    private List<Long>extractServiceIdsFromJson(Map<String, Object> requestBody) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        List<Integer> aServiceList = (List<Integer>) requestBody.get("serviceList");
-        if (aServiceList != null) {
-            return aServiceList.stream().map(Long::valueOf).collect(Collectors.toList());
-        } else {
-            return Collections.emptyList();
 
+
+    //EXTRACT ServiceEntity FROM THE BODY
+  /*  private ServiceEntity extractSeriveEntityFroJson(Map<String, Object> requestBody) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.convertValue(requestBody, ServiceEntity.class);
+    }*/
+    private void addEquipmentToCareUnit(CareUnit iCareUnit, List<Long> iEquipmentList) {
+        // Ajouter les équipements à l'unité de soin
+        for (Long aEquipmentId : iEquipmentList) {
+            Optional<Equipment> aEquipmentOptional = equipmentService.getEquipmentById(aEquipmentId);
+            if (aEquipmentOptional.isPresent()) {
+                Equipment aEquipment = aEquipmentOptional.get();
+                // Créer une association entre l'unité de soin et l'équipement
+                CareUnitEquipLink aAssociation = new CareUnitEquipLink();
+                aAssociation.setCareUnit(iCareUnit);
+                aAssociation.setEquipment(aEquipment);
+                // Enregistrer l'association dans la base de données
+                careUnitService.addEquipmentToCareUnit(aAssociation);
+            } else {
+                // Gérer le cas où l'équipement n'existe pas en retournant une erreur
+                throw new IllegalStateException("L'équipement avec l'ID " + aEquipmentId + " n'existe pas.");
+            }
         }
 
+
     }
-
-    //ADD CAREUNIT , EQUIPMENT AND SERVICE
-    private void addEquipmentsAndServicesToCareUnit(CareUnit iCareUnit, List<Long> iEquipmentList, List<Long> iServiceList) {
-       // Ajouter les équipements à l'unité de soin
-       for (Long aEquipmentId : iEquipmentList) {
-           Optional<Equipment> aEquipmentOptional = equipmentService.getEquipmentById(aEquipmentId);
-           if (aEquipmentOptional.isPresent()) {
-               Equipment aEquipment = aEquipmentOptional.get();
-               // Créer une association entre l'unité de soin et l'équipement
-               CareUnitEquipLink aAssociation = new CareUnitEquipLink();
-               aAssociation.setCareUnit(iCareUnit);
-               aAssociation.setEquipment(aEquipment);
-               // Enregistrer l'association dans la base de données
-               careUnitService.addEquipmentToCareUnit(aAssociation);
-           } else {
-               // Gérer le cas où l'équipement n'existe pas en retournant une erreur
-               throw new IllegalStateException("L'équipement avec l'ID " + aEquipmentId + " n'existe pas.");
-           }
-           }
-
-
-       // Ajouter les services à l'unité de soin
-       for (Long aServiceId : iServiceList) {
-           Optional<ServiceEntity> aServiceOptional = serviceSer.getServiceById(aServiceId);
-           if (aServiceOptional.isPresent()) {
-               ServiceEntity aService = aServiceOptional.get();
-               // Créer une association entre l'unité de soin et le service
-               CareUnitServiceLink aAssociation = new CareUnitServiceLink();
-               aAssociation.setCareUnit(iCareUnit);
-               aAssociation.setService(aService);
-               // Enregistrer l'association dans la base de données
-               careUnitService.addServices(aAssociation);
-           } else {
-               throw new IllegalStateException("Le Service avec l'ID " + aServiceId + " n'existe pas.");
-           }
-       }
-   }
 
 
     // RETRIVE ALL CAREUNITS
@@ -204,11 +183,7 @@ public class CareUnitController {
                 careUnitService.removeEquipmentFromCareUnit(aExistingCareUnit.getCareunitKey(), aAssociation.getEquipment().getEquipementkey());
             }
 
-            // Remove associated Services
-            for (CareUnitServiceLink aAssociation : aExistingCareUnit.getCareUnitServiceLinkSet()) {
-                // Assuming you have a method to remove a Service from a CareUnit
-                careUnitService.removeService(aExistingCareUnit.getCareunitKey(), aAssociation.getService().getServiceKy());
-            }
+
 
             // Delete the CareUnit
             careUnitService.delete(iId);
@@ -230,39 +205,27 @@ public class CareUnitController {
 
 
     //ADD  ROOM IN CAREUNI
+
     @PostMapping("/{id}/AddRoom")
-    public String addRoomToCareUnit(@PathVariable("id") Integer iCareunitKey, @RequestBody Room iRoom) {
+    public String addRoomToCareUnit(@PathVariable ("id") Integer iCareunitKey , @RequestBody Room iRoom){
         try {
             Optional<CareUnit> aCareUnit = careUnitService.getCareUnitByKey(iCareunitKey);
-            Optional<ServiceEntity> serviceEntity = serviceSer.getServiceById(iRoom.getService().getServiceKy());
 
-            if (aCareUnit.isPresent() && serviceEntity.isPresent()) {
-                // Vérifiez si le type d'unité est Cherugie
-                if (aCareUnit.get().getCareuniType() == UnitType.Cherugie) {
-                    // Vérifiez si le service appartient à cette unité spécifique
-                    for (CareUnitServiceLink link : aCareUnit.get().getCareUnitServiceLinkSet()) {
-                        if (link.getService().getServiceKy().equals(serviceEntity.get().getServiceKy())) {
-                            // Associez la chambre au service et ajoutez-la à l'unité de soin
-                            iRoom.setService(serviceEntity.get());
-                            careUnitService.addRoom(aCareUnit.get(), iRoom);
-                            return "La chambre a été ajoutée avec succès !";
-                        }
-                    }
-                    return "Le service spécifié n'appartient pas à cette unité de chirurgie !";
-                } else {
-                    return "Vous ne pouvez ajouter une chambre qu'à une unité de chirurgie !";
-                }
+            if (aCareUnit.isPresent() ) {
+
+                CareUnit aCareuniCapacity=aCareUnit.get();
+                careUnitService.addRoom(aCareUnit.get(), iRoom);
+                return ("la chambre a été ajouté  avec succées ");
             } else {
-                return "Aucune unité de soin ou service existe avec cet ID !";
+                return("Aucune unité de soin existe avec cet ID !");
             }
-        } catch (Exception e) {
-            return e.getMessage();
+        }catch(Exception e){
+            return  (e.getMessage());
         }
     }
 
 
 
-    
 
 
 
@@ -342,6 +305,7 @@ public class CareUnitController {
     // Mise à jour de la méthode pour retourner un message personnalisé
     @CrossOrigin(origins = "http://localhost:4200")
     @PutMapping("/{careunitKey}/UpdateRoom/{roomKey}")
+
     public  String updateRoomInCareUnit(
             @PathVariable("careunitKey") Integer iCareunitKey,
             @PathVariable("roomKey") Integer iRoomKey,
@@ -468,6 +432,9 @@ public class CareUnitController {
 
 
 
+
+
+
     // GET ALL THE  EQUIPMENTS FROM CAREUNIT
     @GetMapping("/{careUnitId}/equipments")
     public Set<CareUnitEquipLink> getEquipmentsByCareUnit(@PathVariable("careUnitId") Integer iCareUnitId) {
@@ -482,16 +449,6 @@ public class CareUnitController {
 
 
 
-   // UPDATE EQUIPMENTS IN CAREUNIT
-    @PutMapping("/{careUnitId}/updateEquipment")
-    public ResponseEntity<String> updateEquipmentInCareUnitPost(@PathVariable("careUnitId") Integer iCareUnitId, @RequestBody UpdateEquipmentRequest iRequest) {
-        try {
-            careUnitService.updateEquipmentInCareUnit(iCareUnitId, iRequest.getOldEquipmentIds(), iRequest.getNewEquipmentIds());
-            return new ResponseEntity<>("L'equipement a été mis a jour avec succées ", HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>("Echéc de mis a jour cet equipement "+e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
 
 
     // DELETE EQUIPMENT FROM CAREUNIT
@@ -508,11 +465,24 @@ public class CareUnitController {
 
 
 
+
+
+    ////////////////
+    @GetMapping("/getService/{Type}")
+    public ResponseEntity <List<ServiceEntity>> findByServiceType(@PathVariable("Type") ServiceType serviceType){
+        List<ServiceEntity>aServiceList=careUnitService.getServicebyType(serviceType);
+        if(aServiceList.isEmpty()){
+            return new  ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }else{
+            return new ResponseEntity<>(aServiceList,HttpStatus.OK);
+        }
+    }
+
     //////////  FOURTH PART : CAREUNIT AND SERVICE ///////////
 
 
     // ADD SERVICE TO CAREUNIT
-
+/*
     @PostMapping("/{careUnitId}/services")
     public String addServicesToCareUnit(@PathVariable("careUnitId") Integer iCareUnitId, @RequestBody List<Long> iServiceList) {
        try{
@@ -597,7 +567,7 @@ public class CareUnitController {
             return ("Echec de supprimer le service"+e.getMessage());
         }
     }
-
+*/
 }
 
 

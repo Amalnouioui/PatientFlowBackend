@@ -1,5 +1,6 @@
 package com.core.Parameterization.Respositories;
 
+import com.core.Parameterization.Entities.Enumeration.ServiceType;
 import com.core.Parameterization.Entities.ServiceEntity;
 
 import java.util.List;
@@ -11,9 +12,9 @@ import org.springframework.stereotype.Repository;
 public interface ServiceRepo extends JpaRepository<ServiceEntity,Long> {
     ServiceEntity findByServiceName(String serviceName);
  // Méthode pour récupérer les services où isSurgeryService est true
-    List<ServiceEntity> findByIsSurgeryServiceTrue();
+    //List<ServiceEntity> findByIsSurgeryServiceTrue();
 
     // Méthode pour récupérer les services où isSurgeryService est false
-    List<ServiceEntity> findByIsSurgeryServiceFalse();
-
+    //List<ServiceEntity> findByIsSurgeryServiceFalse();
+List<ServiceEntity>findByServiceType(ServiceType serviceType);
 }

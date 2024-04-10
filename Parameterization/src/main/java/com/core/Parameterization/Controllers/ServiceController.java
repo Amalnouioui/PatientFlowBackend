@@ -1,5 +1,6 @@
 package com.core.Parameterization.Controllers;
 
+import com.core.Parameterization.Entities.Enumeration.UnitType;
 import com.core.Parameterization.Entities.Equipment;
 import com.core.Parameterization.Entities.ServiceEntity;
 import com.core.Parameterization.Services.ServiceSer;
@@ -71,18 +72,7 @@ public class ServiceController {
             return ("Le service n'existe pas !");
         }
     }
-    
- // Méthode pour récupérer les services où isSurgeryService est true
-    @GetMapping("/surgery")
-    public ResponseEntity<List<ServiceEntity>> getServicesForSurgery() {
-        List<ServiceEntity> servicesForSurgery = serviceSer.getServicesBySurgeyTrue();
-        return new ResponseEntity<>(servicesForSurgery, HttpStatus.OK);
-    }
 
-    // Méthode pour récupérer les services où isSurgeryService est false
-    @GetMapping("/not-surgery")
-    public ResponseEntity<List<ServiceEntity>> getServicesNotForSurgery() {
-        List<ServiceEntity> servicesNotForSurgery = serviceSer.getServicesBySurgeyFalse();
-        return new ResponseEntity<>(servicesNotForSurgery, HttpStatus.OK);
-    }
+
+
 }

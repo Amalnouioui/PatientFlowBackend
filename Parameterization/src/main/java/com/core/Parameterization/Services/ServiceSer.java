@@ -1,5 +1,6 @@
 package com.core.Parameterization.Services;
 
+import com.core.Parameterization.Entities.Enumeration.UnitType;
 import com.core.Parameterization.Entities.Equipment;
 import com.core.Parameterization.Entities.ServiceEntity;
 
@@ -12,9 +13,7 @@ public interface ServiceSer {
     Optional <ServiceEntity> getServiceById(Long serviceKey);
    void  updateService(Long iServiceId,ServiceEntity service);
     void deleteService(Long iServiceId);
-    List<ServiceEntity> getServicesBySurgeyTrue();
-    List<ServiceEntity> getServicesBySurgeyFalse();
 
-
+//List<ServiceEntity>getServicebyType(UnitType unitType);
     
 }

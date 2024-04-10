@@ -1,5 +1,6 @@
 package com.core.Parameterization.Entities;
 
+import com.core.Parameterization.Entities.Enumeration.ServiceType;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -24,16 +25,33 @@ public class ServiceEntity {
     private Long serviceKy;
     @Column(name="Service_Name",nullable = false)
     private String serviceName;
-    
-    @OneToMany(mappedBy = "service",cascade = CascadeType.ALL,orphanRemoval = true)
-    private List<Room> rooms;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name="Service_serviceType",nullable = false)
+
+    private ServiceType serviceType;
+
+    public ServiceType getServiceType() {
+        return serviceType;
+    }
+
+    public void setServiceType(ServiceType serviceType) {
+        this.serviceType = serviceType;
+    }
+
+    public List<CareUnit> getServiceCareunits() {
+        return serviceCareunits;
+    }
+
+    public void setServiceCareunits(List<CareUnit> serviceCareunits) {
+        this.serviceCareunits = serviceCareunits;
+    }
 
     @JsonIgnore
-    @OneToMany(mappedBy = "service",cascade = CascadeType.ALL,orphanRemoval = true)
-    Set<CareUnitServiceLink>careUnitServiceLinkSet;
+    @OneToMany(mappedBy = "serviceCareunits",cascade = CascadeType.ALL,orphanRemoval = true)
+
+    List<CareUnit>serviceCareunits;
     
-    
-    private boolean isSurgeryService; // Champ indiquant si c'est un service de chirurgie ou non
 
 
     public Long getServiceKy() {
@@ -52,28 +70,13 @@ public class ServiceEntity {
         serviceName = iServiceName;
     }
 
-    public Set<CareUnitServiceLink> getCareUnitServiceLinkSet() {
-        return careUnitServiceLinkSet;
-    }
 
-    public void setCareUnitServiceLinkSet(Set<CareUnitServiceLink> iCareUnitServiceLinkSet) {
-        this.careUnitServiceLinkSet = iCareUnitServiceLinkSet;
-    }
 
-	public List<Room> getRooms() {
-		return rooms;
-	}
 
-	public void setRooms(List<Room> rooms) {
-		this.rooms = rooms;
-	}
 
-	public boolean isSurgeryService() {
-		return isSurgeryService;
-	}
 
-	public void setSurgeryService(boolean isSurgeryService) {
-		this.isSurgeryService = isSurgeryService;
-	}
+
+
+
 
 }

@@ -17,5 +17,5 @@ public interface PatientService {
 	    List<Patient> searchPatientsByName(String patientFirstName, String patientLastName);
 	    List<Patient> searchPatientsByDateOfBirth(Date dob);
 	    List<Patient> searchPatientsByGender(Gender gender);
-
+	List<Patient>searchPatientByFullConditions(String patientFirstName, String patientLastName, Gender patientGender,Date DOB);
 }

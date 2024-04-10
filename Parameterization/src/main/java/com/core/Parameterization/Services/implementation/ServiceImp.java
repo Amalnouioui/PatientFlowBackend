@@ -1,6 +1,8 @@
 package com.core.Parameterization.Services.implementation;
 
 import com.core.Parameterization.Entities.CareUnitServiceLink;
+import com.core.Parameterization.Entities.Enumeration.ServiceType;
+import com.core.Parameterization.Entities.Enumeration.UnitType;
 import com.core.Parameterization.Entities.ServiceEntity;
 import com.core.Parameterization.Respositories.CareUnitServiceLinkRepo;
 import com.core.Parameterization.Respositories.ServiceRepo;
@@ -66,22 +68,14 @@ public void deleteService(Long serviceId) {
     // Ensuite, supprimer le service lui-même
     serviceRepo.deleteById(serviceId);
 }
-@Override
-public List<ServiceEntity> getServicesBySurgeyTrue() {
-	// TODO Auto-generated method stub
-	return serviceRepo.findByIsSurgeryServiceTrue()  ;
-}
-@Override
-public List<ServiceEntity> getServicesBySurgeyFalse() {
-	// TODO Auto-generated method stub
-	return serviceRepo.findByIsSurgeryServiceFalse()  ;
-
-}
-
-
-
-
 
 
 
 }
+
+
+
+
+
+
+

@@ -8,7 +8,7 @@ eureka:
       
       
 server:
-  port: 8092
+  port: 8091
 spring:
   application:
     name: patient
@@ -16,9 +16,9 @@ spring:
     import: optional:configserver:http://localhost:8888
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/patientbackoff
+    url: jdbc:mysql://localhost:3306/patientbd
     username: root
-    password: 
+    password: root
   jpa:
     hibernate:
       ddl-auto: update

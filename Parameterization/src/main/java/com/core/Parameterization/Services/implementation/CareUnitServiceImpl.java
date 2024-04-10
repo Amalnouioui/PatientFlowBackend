@@ -2,6 +2,7 @@ package com.core.Parameterization.Services.implementation;
 
 import com.core.Parameterization.Entities.*;
 import com.core.Parameterization.Entities.Enumeration.RoomType;
+import com.core.Parameterization.Entities.Enumeration.ServiceType;
 import com.core.Parameterization.Entities.Enumeration.UnitStatus;
 import com.core.Parameterization.Entities.Enumeration.UnitType;
 import com.core.Parameterization.Respositories.*;
@@ -185,41 +186,16 @@ import java.util.*;
             careUnitEquipLink.save(iAssociation);
         }
 
-    @Override
-    @Transactional
-    public void updateEquipmentInCareUnit(Integer iCareUnitId, List<Long> ioldEquipmentList, List<Long> iNewEquipmentList) {
-        CareUnit aCareUnit = careUnitRepository.findById(iCareUnitId)
-                .orElseThrow(() -> new IllegalArgumentException("Aucune unité de soin existe avec cette ID  !"));
-
-        for (int i = 0; i < ioldEquipmentList.size(); i++) {
-            Long aOldEquipmentId = ioldEquipmentList.get(i);
-            Long aNewEquipmentId = iNewEquipmentList.get(i);
-
-            // Check if the old equipment ID exists in the CareUnitEquipLink association
-            CareUnitEquipLink equipLinkToUpdate = aCareUnit.getCareUnitEquipLinkSet().stream()
-                    .filter(link -> link.getEquipment().getEquipementkey().equals(aOldEquipmentId))
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalArgumentException("L' equipement n'existe pas dans cette unité  "));
-
-            // Check if the new equipment ID exists in the equipment table
-            Equipment newEquipment = equipementRepository.findById(aNewEquipmentId)
-                    .orElseThrow(() -> new IllegalArgumentException("Aucun equipement existe avec cette ID"));
-
-            // Update the equipment ID in the association
-            equipLinkToUpdate.setEquipment(newEquipment);
-        }
-
-        // Save the updated CareUnit entity
-        careUnitRepository.save(aCareUnit);
-    }
 
 
+/*
     @Transactional
     public void addServices(CareUnitServiceLink iCareUnitServiceLink){
 
         careUnitServiceLinkRepo.save(iCareUnitServiceLink);
 
     }
+    /*
 @Override
 @Transactional
     public void updateService(Integer iCareUnitId,  List<Long>iOldServiceList, List<Long> iNewServiceList) {
@@ -268,7 +244,7 @@ import java.util.*;
         CareUnit aCareUnit = careUnitRepository.findById(iCareUnitId).orElseThrow(() -> new RuntimeException("Aucune  unité existe avec cette ID"));
         return aCareUnit.getCareUnitServiceLinkSet();
     }
-
+*/
 
    @Override
     public List<CareUnit> searchByCriteria(int careunitCapacity, UnitType careuniType, UnitStatus careunitStatue) {
@@ -281,7 +257,9 @@ import java.util.*;
         }
     }
 
-
+public List<ServiceEntity>getServicebyType (ServiceType serviceType){
+       return careUnitRepository.GetBuSerivecType(serviceType);
+}
 }
 
 
