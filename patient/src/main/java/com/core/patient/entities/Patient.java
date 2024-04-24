@@ -2,6 +2,7 @@ package com.core.patient.entities;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 
 import com.core.patient.entities.enumeration.Country;
@@ -10,6 +11,9 @@ import com.core.patient.entities.enumeration.IdentityType;
 import com.core.patient.entities.enumeration.Nationality;
 import com.core.patient.entities.enumeration.SocialStatus;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,6 +26,7 @@ import lombok.NoArgsConstructor;
 @Data
 @Entity
 @Table(name = "Patient")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "Patient_Key")
 public class Patient {
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -83,14 +88,17 @@ public class Patient {
 
     @OneToMany(mappedBy = "patient",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<Historique> historiques;
-    
-    
-    
-    
-    
-    
 
-    
-	
+
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "patient")
+    Set<Rapport> rapports;
+
+
+
+
+
+
 
 }

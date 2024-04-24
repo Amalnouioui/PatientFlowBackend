@@ -60,17 +60,17 @@ class RoomControllerTest {
             careUnit.setCareUnit_EndTime(new Timestamp(currentTimeMillis));
             // Initialisation des identifiants d'équipements et de services
             careUnit.setEquipmentList(new ArrayList<>());
-            careUnit.setServiceList(new ArrayList<>());
+          //  careUnit.setServiceList(new ArrayList<>());
             List<Long> equipmentIds = Arrays.asList(1L, 3L);
             List<Long> serviceIds = Arrays.asList(1L, 2L, 3L);
             careUnit.setEquipmentList(equipmentIds);
-            careUnit.setServiceList(serviceIds);
+          //  careUnit.setServiceList(serviceIds);
 
             //bed
             bed.setBedKey(10);
             bed.setBedNumber(101);
             bed.setBedDescription("new bed  ");
-            bed.setBedType(BedType.Double);
+            bed.setBedType(BedType.Simple);
             bed.setBedStatue(BedStatus.En_Maintenance);
             bed.setPoids(80);
             bed.setPhysicalState(BedPhysicalCondition.Bon_Etat);
@@ -106,11 +106,11 @@ class RoomControllerTest {
             careunitToAdd.setCareUnit_EndTime(new Timestamp(currentTimeMillis));
             // Initialisation des identifiants d'équipements et de services
             careunitToAdd.setEquipmentList(new ArrayList<>());
-            careunitToAdd.setServiceList(new ArrayList<>());
+           // careunitToAdd.setServiceList(new ArrayList<>());
             List<Long> equipmentIds = Arrays.asList(1L, 3L);
             List<Long> serviceIds = Arrays.asList(1L, 2L, 3L);
             careunitToAdd.setEquipmentList(equipmentIds);
-            careunitToAdd.setServiceList(serviceIds);
+        //    careunitToAdd.setServiceList(serviceIds);
 
             room.setCareunitRoom(careunitToAdd);
 
