@@ -1,14 +1,8 @@
 package com.core.Parameterization.Services.implementation;
 
 import com.core.Parameterization.Entities.*;
-import com.core.Parameterization.Entities.Enumeration.BedPhysicalCondition;
-import com.core.Parameterization.Entities.Enumeration.BedStatus;
-import com.core.Parameterization.Entities.Enumeration.BedType;
-import com.core.Parameterization.Entities.Enumeration.RoomType;
-import com.core.Parameterization.Respositories.BedEquiLinkRepo;
-import com.core.Parameterization.Respositories.BedRespository;
-import com.core.Parameterization.Respositories.EquipementRepository;
-import com.core.Parameterization.Respositories.RoomRepository;
+import com.core.Parameterization.Entities.Enumeration.*;
+import com.core.Parameterization.Respositories.*;
 import com.core.Parameterization.Services.BedService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -27,17 +21,23 @@ public class BedServiceImpl implements BedService {
     private BedRespository bedRespository;
     private EquipementRepository equipementRepository;
     private BedEquiLinkRepo bedEquiLinkRepo;
-
+private BedLockedRepository bedLockedRepository;
     @Autowired
-    public BedServiceImpl(BedRespository iBedRepository, RoomRepository iRoomRepository, EquipementRepository iEquipementRepository, BedEquiLinkRepo iBedEquiLinkRepo) {
+    public BedServiceImpl(BedLockedRepository ibedLockedRepository, BedRespository iBedRepository, RoomRepository iRoomRepository, EquipementRepository iEquipementRepository, BedEquiLinkRepo iBedEquiLinkRepo) {
 
         this.bedRespository = iBedRepository;
         this.roomRepository = iRoomRepository;
         this.equipementRepository = iEquipementRepository;
         this.bedEquiLinkRepo = iBedEquiLinkRepo;
+        this.bedLockedRepository=ibedLockedRepository;
 
     }
+    @Override
+    public void saveBed(Bed iBed) {
 
+       // iBed.setRoomBed(room); // Définition de la clé étrangère de Room dans l'objet Bed
+        bedRespository.save(iBed); // Enregistrement du lit avec la clé étrangère de Room
+    }
     @Override
     public void create(Bed iBed) {
         Optional<Room> aRoomOptional = roomRepository.findById(iBed.getRoomBed().getRoomKey());
@@ -230,4 +230,30 @@ public class BedServiceImpl implements BedService {
         }
 
     }
+
+
+
+
+
+
+
+
+
+    @Override
+    public Bed isPatientAssignedToBed(Integer patientId) {
+        // Vérifier si l'ID du patient est présent dans la table bedLocked
+        BedLocked bedLocked = bedLockedRepository.findByBedLockedOccupantKyAndAndBedLockedOccupantType(patientId, OccupantType.Patient);
+        if (bedLocked != null) {
+            Bed associatedBed = bedLocked.getBed();
+            if (associatedBed != null) {
+                return associatedBed;
+            } else {
+                throw new IllegalStateException("Le lit associé à ce patient n'est pas trouvé.");
+            }
+        } else {
+            throw new IllegalStateException("Ce patient n'est pas associé à un lit.");
+        }
+    }
+
+
 }

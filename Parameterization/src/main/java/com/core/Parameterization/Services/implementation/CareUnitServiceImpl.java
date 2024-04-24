@@ -1,15 +1,10 @@
 package com.core.Parameterization.Services.implementation;
 
 import com.core.Parameterization.Entities.*;
-import com.core.Parameterization.Entities.Enumeration.RoomType;
-import com.core.Parameterization.Entities.Enumeration.ServiceType;
-import com.core.Parameterization.Entities.Enumeration.UnitStatus;
-import com.core.Parameterization.Entities.Enumeration.UnitType;
+import com.core.Parameterization.Entities.Enumeration.*;
 import com.core.Parameterization.Respositories.*;
-import com.core.Parameterization.Services.CareUnitEquipLinkService;
 import com.core.Parameterization.Services.CareUnitService;
 import com.core.Parameterization.Services.EquipmentService;
-import com.core.Parameterization.Services.ServiceSer;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,15 +20,16 @@ import java.util.*;
     @Autowired
 
     private CareUnitEquipLinkRepo careUnitEquipLink;
-    @Autowired
-    private CareUnitServiceLinkRepo careUnitServiceLinkRepo;
-    @Autowired
-    private ServiceRepo serviceRepo;
+
     @Autowired
     private EquipmentService equipmentService;
     @Autowired
-    private ServiceSer serviceSer;
+    private RoomRepository roomRepository;
+    @Autowired
+    private BedLockedRepository bedLockedRepository;
 
+    @Autowired
+    private BedRespository bedRespository;
 
     public CareUnitServiceImpl(CareUnitRepository careUnitRepository) {
         this.careUnitRepository = careUnitRepository;
@@ -150,7 +146,6 @@ import java.util.*;
     }
 
 
-
     @Override
     public void updateCareUnit(CareUnit iCareUnit) {
         careUnitRepository.save(iCareUnit);
@@ -164,113 +159,408 @@ import java.util.*;
     }
 
 
-
-
- @Transactional
- public void removeEquipmentFromCareUnit(Integer iCareUnitId, Long iEquipmentId) {
-     // Retrieve all associations between the care unit and equipment
-     List<CareUnitEquipLink> aAssociations = careUnitEquipLink.findByCareUnit_CareunitKeyAndEquipment_Equipementkey(iCareUnitId, iEquipmentId);
-
-     if (!aAssociations.isEmpty()) {
-         // Sélectionnez la première association trouvée et supprimez-la
-         CareUnitEquipLink aAssociationToDelete = aAssociations.get(0);
-         careUnitEquipLink.delete(aAssociationToDelete);
-     } else {
-         // If no associations are found, throw an exception
-         throw new IllegalArgumentException("Aucune association existe entre l'equipement et cette unité ");
-     }
- }
-
-
-        public void addEquipmentToCareUnit(CareUnitEquipLink iAssociation) {
-            careUnitEquipLink.save(iAssociation);
-        }
-
-
-
-/*
     @Transactional
-    public void addServices(CareUnitServiceLink iCareUnitServiceLink){
+    public void removeEquipmentFromCareUnit(Integer iCareUnitId, Long iEquipmentId) {
+        // Retrieve all associations between the care unit and equipment
+        List<CareUnitEquipLink> aAssociations = careUnitEquipLink.findByCareUnit_CareunitKeyAndEquipment_Equipementkey(iCareUnitId, iEquipmentId);
 
-        careUnitServiceLinkRepo.save(iCareUnitServiceLink);
-
-    }
-    /*
-@Override
-@Transactional
-    public void updateService(Integer iCareUnitId,  List<Long>iOldServiceList, List<Long> iNewServiceList) {
-
-    CareUnit careUnit = careUnitRepository.findById(iCareUnitId)
-            .orElseThrow(() -> new IllegalArgumentException("Aucune unit existe avec cette ID"));
-
-    for (int i = 0; i < iOldServiceList.size(); i++) {
-        Long aOldServiceId = iOldServiceList.get(i);
-        Long aNewServiceId = iNewServiceList.get(i);
-
-        // Check if the old equipment ID exists in the CareUnitEquipLink association
-        CareUnitServiceLink aCareUnitServiceLink = careUnit.getCareUnitServiceLinkSet().stream()
-                .filter(link -> link.getService().getServiceKy().equals(aOldServiceId))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Le service n'existe pas dans cette unité de soin "));
-
-        // Check if the new equipment ID exists in the equipment table
-        ServiceEntity aServiceEntity = serviceRepo.findById(aNewServiceId)
-                .orElseThrow(() -> new IllegalArgumentException("Aucun service avec cette ID"));
-
-        // Update the equipment ID in the association
-        aCareUnitServiceLink.setService(aServiceEntity);
-    }
-
-
-}
-
-
-@Override
-    @Transactional
-    public void removeService(Integer iCareUnitId, Long iServiceKy) {
-        // Vérifier si l'association entre l'unité de soins et l'équipement existe
-        List<CareUnitServiceLink> aAssociations = careUnitServiceLinkRepo.findByService_ServiceKyAndCareUnit_CareunitKey(iServiceKy, iCareUnitId);
         if (!aAssociations.isEmpty()) {
-            CareUnitServiceLink aAssociationToDelete = aAssociations.get(0);
-            // Supprimer l'association
-            careUnitServiceLinkRepo.delete(aAssociationToDelete);
+            // Sélectionnez la première association trouvée et supprimez-la
+            CareUnitEquipLink aAssociationToDelete = aAssociations.get(0);
+            careUnitEquipLink.delete(aAssociationToDelete);
         } else {
-            // Lancer une exception si l'association n'existe pas
-            throw new IllegalArgumentException("Aucune association existe entre le service et cette unité ");
+            // If no associations are found, throw an exception
+            throw new IllegalArgumentException("Aucune association existe entre l'equipement et cette unité ");
         }
     }
-    @Override
-    public Set<CareUnitServiceLink> getServicesByCareUnit(Integer iCareUnitId) {
-        CareUnit aCareUnit = careUnitRepository.findById(iCareUnitId).orElseThrow(() -> new RuntimeException("Aucune  unité existe avec cette ID"));
-        return aCareUnit.getCareUnitServiceLinkSet();
-    }
-*/
 
-   @Override
-    public List<CareUnit> searchByCriteria(int careunitCapacity, UnitType careuniType, UnitStatus careunitStatue) {
-        List<CareUnit> listCareUnit=careUnitRepository.findByCareunitCapacityAndCareuniTypeAndCareunitStatue(careunitCapacity,careuniType,careunitStatue);
-        if(listCareUnit.size()>0) {
-            return listCareUnit;
+
+    public void addEquipmentToCareUnit(CareUnitEquipLink iAssociation) {
+        careUnitEquipLink.save(iAssociation);
+    }
+
+    @Override
+    @Transactional
+    public void updateEquipmentInCareUnit(Integer iCareUnitId, List<Long> ioldEquipmentList, List<Long> iNewEquipmentList) {
+        CareUnit aCareUnit = careUnitRepository.findById(iCareUnitId)
+                .orElseThrow(() -> new IllegalArgumentException("Aucune unité de soin existe avec cette ID  !"));
+
+        for (int i = 0; i < ioldEquipmentList.size(); i++) {
+            Long aOldEquipmentId = ioldEquipmentList.get(i);
+            Long aNewEquipmentId = iNewEquipmentList.get(i);
+
+            // Check if the old equipment ID exists in the CareUnitEquipLink association
+            CareUnitEquipLink equipLinkToUpdate = aCareUnit.getCareUnitEquipLinkSet().stream()
+                    .filter(link -> link.getEquipment().getEquipementkey().equals(aOldEquipmentId))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("L' equipement n'existe pas dans cette unité  "));
+
+            // Check if the new equipment ID exists in the equipment table
+            Equipment newEquipment = equipementRepository.findById(aNewEquipmentId)
+                    .orElseThrow(() -> new IllegalArgumentException("Aucun equipement existe avec cette ID"));
+
+            // Update the equipment ID in the association
+            equipLinkToUpdate.setEquipment(newEquipment);
         }
-        else {
+
+        // Save the updated CareUnit entity
+        careUnitRepository.save(aCareUnit);
+    }
+
+
+    @Override
+    public List<CareUnit> searchByCriteria(int careunitCapacity, UnitType careuniType, UnitStatus careunitStatue) {
+        List<CareUnit> listCareUnit = careUnitRepository.findByCareunitCapacityAndCareuniTypeAndCareunitStatue(careunitCapacity, careuniType, careunitStatue);
+        if (listCareUnit.size() > 0) {
+            return listCareUnit;
+        } else {
             throw new IllegalArgumentException("Il n'xiste aucune unité avec ces critéres ! ");
         }
     }
 
-public List<ServiceEntity>getServicebyType (ServiceType serviceType){
-       return careUnitRepository.GetBuSerivecType(serviceType);
+    /* @Override
+     public List<Room> getRoomsInCareUnit(Integer careunitKey, RoomType roomType) {
+         List<Room> aRoomList = roomRepository.findByCareunitRoom_CareunitKeyAndRoomType(careunitKey, roomType);
+         List<Room> filteredRooms = new ArrayList<>();
+         Date PatientEnteryPlanned;
+         if (aRoomList.isEmpty()) {
+             throw new IllegalStateException("Aucune chambre dans cette unité");
+         }
+
+         for (Room aRoom : aRoomList) {
+             boolean isGoodOrNeedsMinorRepair = false;
+
+             for (Bed aBed : aRoom.getRoomBed()) {
+                 // Check if the bed is in good condition or needs minor repairs
+                 if ((aBed.getPhysicalState() == BedPhysicalCondition.Bon_Etat ||
+                         aBed.getPhysicalState() == BedPhysicalCondition.Besoin_De_Reparation_Mineur) &&
+                         !isBedInBedLocked(aBed)) {
+                     isGoodOrNeedsMinorRepair = true;
+                     break; // Exit loop as soon as we find a bed in good condition or needing minor repairs
+
+                 }
+             }
+
+             if (isGoodOrNeedsMinorRepair) {
+                 filteredRooms.add(aRoom); // If at least one bed in the room is in good condition or needs minor repairs, add the room to the filtered list
+             }
+         }
+
+         return filteredRooms;
+     }
+ */
+    @Override
+    @Transactional
+
+    /*public List<Room> getRoomsInCareUnit(Integer careunitKey, RoomType roomType, Date bedLocked_PlannedUnxTmBgn, Date bedLocked_PlannedUnxTmEnd, double patientWeight, boolean accompagnement) {
+        List<Room> aRoomList = roomRepository.findByCareunitRoom_CareunitKeyAndRoomType(careunitKey, roomType);
+       //declaration
+        List<Room> filteredRooms = new ArrayList<>();
+
+        if (aRoomList.isEmpty()) {
+            throw new IllegalStateException("Aucune chambre de type " + roomType + " dans cette unité");
+        }
+
+        for (Room aRoom : aRoomList) {
+            int simpleBedCount = 0;
+            int medicalBedCount = 0;
+            boolean isGoodOrNeedsMinorRepair = false;
+            boolean isNotReserved = false;
+            boolean isPerfectWeight = false;
+
+            for (Bed aBed : aRoom.getRoomBed()) {
+                if (!(isBedInBedLocked(aBed))) {
+                    if ((aBed.getBedType() == BedType.Simple || aBed.getBedType() == BedType.Medicalise) && (verifyGoodRoomCondition(aBed,patientWeight))) {
+                        if (aBed.getBedType() == BedType.Simple) {
+                            simpleBedCount++;
+                        } else {
+                            medicalBedCount++;
+                        }
+                        isGoodOrNeedsMinorRepair = true;
+                        isNotReserved = true;
+                        isPerfectWeight = true;
+
+                    }
+                } else if (checkdates(aBed, bedLocked_PlannedUnxTmBgn, bedLocked_PlannedUnxTmEnd)) {
+                    if ((aBed.getBedType() == BedType.Simple || aBed.getBedType() == BedType.Medicalise) && verifyGoodRoomCondition(aBed,patientWeight)) {
+                        if (aBed.getBedType() == BedType.Simple) {
+                            simpleBedCount++;
+                        } else {
+                            medicalBedCount++;
+                        }
+                        isGoodOrNeedsMinorRepair = true;
+                        isNotReserved = true;
+                        isPerfectWeight = true;
+
+                    }
+                }
+                System.out.println(checkdates(aBed, bedLocked_PlannedUnxTmBgn, bedLocked_PlannedUnxTmEnd));
+            }
+
+            if (roomType == RoomType.Double) {
+
+                if ((simpleBedCount == 2 || (simpleBedCount == 1 && medicalBedCount == 1)) && isGoodOrNeedsMinorRepair && isPerfectWeight && isNotReserved && accompagnement) {
+                    filteredRooms.add(aRoom);
+
+                } else if    ((simpleBedCount == 2 || (simpleBedCount == 1 && medicalBedCount == 1) || medicalBedCount == 2) & !accompagnement){
+                    for(Bed aBed : aRoom.getRoomBed()){
+                        if(verifyGoodRoomCondition(aBed,patientWeight) && isNotReserved ){
+                            filteredRooms.add(aRoom);
+                        }
+                    }
+
+
+                }
+            }
+
+
+            else if (roomType == RoomType.COLLECTIVE) {
+                for (Bed aBed : aRoom.getRoomBed()) {
+                    if (verifyGoodRoomCondition(aBed, patientWeight)) {
+                        if (isBedInBedLocked(aBed)) {
+                            if (checkdates(aBed, bedLocked_PlannedUnxTmBgn, bedLocked_PlannedUnxTmEnd)) {
+                                // Si le lit est réservé et que les dates ne se chevauchent pas, il remplit les conditions
+                                isNotReserved = true;
+                                isGoodOrNeedsMinorRepair = true;
+                                isPerfectWeight = true;
+                            }
+                        } else {
+                            // Si le lit n'est pas réservé, il remplit les conditions
+                            isNotReserved = true;
+                            isGoodOrNeedsMinorRepair = true;
+                            isPerfectWeight = true;
+                        }
+                    }
+                }
+
+                // Si au moins un lit remplit toutes les conditions, ajouter la chambre à la liste filtrée
+                if (isPerfectWeight && isNotReserved && isGoodOrNeedsMinorRepair) {
+                    filteredRooms.add(aRoom);
+                } else {
+                    throw new IllegalStateException("Aucun lit dans la chambre collective ne remplit les conditions requises.");
+                }
+            }
+
+
+
+            else {
+                if (isGoodOrNeedsMinorRepair && isPerfectWeight && !accompagnement && isNotReserved ) {
+                    filteredRooms.add(aRoom);
+                }
+            }
+        }
+
+        return filteredRooms;
+    }
+*/
+    public List<Room> getRoomsInCareUnit(Integer careunitKey, RoomType roomType, Date bedLocked_PlannedUnxTmBgn, Date bedLocked_PlannedUnxTmEnd, double patientWeight, boolean accompagnement) {
+        List<Room> aRoomList = roomRepository.findByCareunitRoom_CareunitKeyAndRoomType(careunitKey, roomType);
+        //declaration
+        List<Room> filteredRooms = new ArrayList<>();
+
+        if (aRoomList.isEmpty()) {
+            throw new IllegalStateException("Aucune chambre de type " + roomType + " dans cette unité");
+        }
+
+        for (Room aRoom : aRoomList) {
+            int simpleBedCount = 0;
+            int medicalBedCount = 0;
+            boolean isGoodOrNeedsMinorRepair = false;
+            boolean isNotReserved = false;
+            boolean isPerfectWeight = false;
+
+            for (Bed aBed : aRoom.getRoomBed()) {
+                if (!(isBedInBedLocked(aBed))) {
+                    if ((aBed.getBedType() == BedType.Simple || aBed.getBedType() == BedType.Medicalise) && (verifyGoodRoomCondition(aBed,patientWeight))) {
+                        if (aBed.getBedType() == BedType.Simple) {
+                            simpleBedCount++;
+                        } else {
+                            medicalBedCount++;
+                        }
+                        isGoodOrNeedsMinorRepair = true;
+                        isNotReserved = true;
+                        isPerfectWeight = true;
+
+                    }
+                } else if (checkdates(aBed, bedLocked_PlannedUnxTmBgn, bedLocked_PlannedUnxTmEnd)) {
+                    if ((aBed.getBedType() == BedType.Simple || aBed.getBedType() == BedType.Medicalise) && verifyGoodRoomCondition(aBed,patientWeight)) {
+                        if (aBed.getBedType() == BedType.Simple) {
+                            simpleBedCount++;
+                        } else {
+                            medicalBedCount++;
+                        }
+                        isGoodOrNeedsMinorRepair = true;
+                        isNotReserved = true;
+                        isPerfectWeight = true;
+
+                    }
+                }
+                System.out.println(checkdates(aBed, bedLocked_PlannedUnxTmBgn, bedLocked_PlannedUnxTmEnd));
+            }
+
+            if (roomType == RoomType.Double) {
+                if ((simpleBedCount == 2 || (simpleBedCount == 1 && medicalBedCount == 1)) && isGoodOrNeedsMinorRepair && isPerfectWeight && isNotReserved && accompagnement) {
+                    filteredRooms.add(aRoom);
+                } else if (!accompagnement) {
+                    boolean isValidRoom = false;
+                    for (Bed aBed : aRoom.getRoomBed()) {
+                        if (verifyGoodRoomCondition(aBed, patientWeight) && isNotReserved) {
+                            isValidRoom = true;
+                            break; // Sortir de la boucle dès qu'un lit valide est trouvé
+                        }
+                    }
+                    if (isValidRoom) {
+                        filteredRooms.add(aRoom);
+                    }
+                }
+            }
+
+
+
+            else if (roomType == RoomType.COLLECTIVE) {
+                for (Bed aBed : aRoom.getRoomBed()) {
+                    if (verifyGoodRoomCondition(aBed, patientWeight)) {
+                        if (isBedInBedLocked(aBed)) {
+                            if (checkdates(aBed, bedLocked_PlannedUnxTmBgn, bedLocked_PlannedUnxTmEnd)) {
+                                // Si le lit est réservé et que les dates ne se chevauchent pas, il remplit les conditions
+                                isNotReserved = true;
+                                isGoodOrNeedsMinorRepair = true;
+                                isPerfectWeight = true;
+                            }
+                        } else {
+                            // Si le lit n'est pas réservé, il remplit les conditions
+                            isNotReserved = true;
+                            isGoodOrNeedsMinorRepair = true;
+                            isPerfectWeight = true;
+                        }
+                    }
+                }
+
+                // Si au moins un lit remplit toutes les conditions, ajouter la chambre à la liste filtrée
+                if (isPerfectWeight && isNotReserved && isGoodOrNeedsMinorRepair) {
+                    filteredRooms.add(aRoom);
+                } else {
+                    throw new IllegalStateException("Aucun lit dans la chambre collective ne remplit les conditions requises.");
+                }
+            }
+
+
+
+            else if(roomType == RoomType.Simple && !accompagnement ){
+                if(   isGoodOrNeedsMinorRepair &&  isNotReserved &&     isPerfectWeight  ) {
+                    filteredRooms.add(aRoom);
+                }
+                }
+
+
+
+            }
+
+
+        return filteredRooms;
+    }
+
+    private boolean isBedInBedLocked(Bed aBed) {
+       List<BedLocked> aBedBedLockeds=aBed.getBedLockeds();
+       if(!aBedBedLockeds.isEmpty()){
+           return true ;
+       }
+       return false ;
+
+
+    }
+
+   /* private boolean checkdates(Bed aBed, Date newPatientEntryDate, Date newPatientExitDate) {
+        // Vérifier si le lit est réservé dans la table bedLocked
+        if (isBedInBedLocked(aBed)) {
+            for (BedLocked abedLockeds : aBed.getBedLockeds()) {
+                Date plannedUnxTmBgn = abedLockeds.getBedLocked_PlannedUnxTmBgn();
+                Date plannedUnxTmEnd = abedLockeds.getBedLocked_PlannedUnxTmEnd();
+                Date realUnxBgn = abedLockeds.getBedLocked_RealUnxTmBgn();
+                Date realUnxEnd = abedLockeds.getBedLocked_RealUnxTmEnd();
+
+                if ((plannedUnxTmEnd != null && plannedUnxTmBgn != null) || (realUnxBgn != null && realUnxEnd != null)) {
+                    // Vérifier si les dates du nouveau patient chevauchent les dates de réservation du lit
+                    if ((newPatientEntryDate.after(plannedUnxTmEnd) && newPatientExitDate.after(newPatientEntryDate)) ||
+                            (newPatientExitDate.before(plannedUnxTmBgn) && newPatientExitDate.after(newPatientEntryDate))) {
+                        return true;
+                    } else {
+                        if ((newPatientEntryDate.after(realUnxEnd) && (newPatientEntryDate.before(newPatientExitDate))) || (newPatientExitDate.after(realUnxBgn) && (newPatientEntryDate.before(newPatientExitDate)))) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            // Toutes les entrées "bedLocked" ont été vérifiées et aucune n'a de conflit de dates
+            return false;
+        }
+        // Aucune réservation pour ce lit
+        return false;
+    }*/
+
+
+
+
+    private boolean checkdates(Bed aBed, Date newPatientEntryDate, Date newPatientExitDate) {
+        // Vérifier si le lit est réservé dans la table bedLocked
+        if (isBedInBedLocked(aBed)) {
+            for (BedLocked abedLockeds : aBed.getBedLockeds()) {
+                Date plannedUnxTmBgn = abedLockeds.getBedLocked_PlannedUnxTmBgn();
+                Date plannedUnxTmEnd = abedLockeds.getBedLocked_PlannedUnxTmEnd();
+                Date realUnxBgn = abedLockeds.getBedLocked_RealUnxTmBgn();
+                Date realUnxEnd = abedLockeds.getBedLocked_RealUnxTmEnd();
+
+                // Vérifier si les dates du nouveau patient chevauchent les dates de réservation du lit
+                if ((plannedUnxTmEnd != null && plannedUnxTmBgn != null)) {
+                    if(newPatientExitDate.after(plannedUnxTmBgn) ||(newPatientEntryDate.before(plannedUnxTmEnd))
+                            && newPatientExitDate.after(newPatientEntryDate)){
+                        return false;
+                    }
+
+                }else if(realUnxBgn!=null && realUnxEnd!=null) {
+                    if( (newPatientEntryDate.before(realUnxEnd) || (newPatientExitDate.after(realUnxBgn)
+                             && newPatientExitDate.after(newPatientEntryDate))))
+                    {
+                        // Conflit trouvé, retourner faux immédiatement
+                        return false;
+                    }
+                }
+
+
+            }
+
+            // Aucun conflit trouvé, retourner vrai
+            return true;
+        }
+
+        // Aucune réservation pour ce lit, donc aucun conflit
+        return true;
+    }
+
+
+    private boolean weightCheck(Bed aBed, double patientWeight) {
+        if (aBed.getPoids() >= patientWeight) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+
+private boolean verifyGoodRoomCondition(Bed bed , double patientWeight){
+        if((bed.getPhysicalState() == BedPhysicalCondition.Bon_Etat || bed.getPhysicalState() == BedPhysicalCondition.Besoin_De_Reparation_Mineur)&&(weightCheck(bed, patientWeight))){
+            return true;
+        }
+        return false;
 }
+
+
+
+
+
+
 }
-
-
-
-
-
-
-
-
-
-
 
 
 

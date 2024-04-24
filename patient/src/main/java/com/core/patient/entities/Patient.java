@@ -1,6 +1,7 @@
 package com.core.patient.entities;
 
 import java.util.Date;
+import java.util.List;
 
 
 import com.core.patient.entities.enumeration.Country;
@@ -9,15 +10,7 @@ import com.core.patient.entities.enumeration.IdentityType;
 import com.core.patient.entities.enumeration.Nationality;
 import com.core.patient.entities.enumeration.SocialStatus;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -84,11 +77,12 @@ public class Patient {
     @Enumerated(EnumType.STRING)
     @Column(name = "socialStatus")
     private SocialStatus socialStatus;
-    
 
-    
-    
-    
+
+
+
+    @OneToMany(mappedBy = "patient",cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<Historique> historiques;
     
     
     

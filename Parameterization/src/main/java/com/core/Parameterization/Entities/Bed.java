@@ -78,11 +78,26 @@ public class Bed {
     private Integer poids;
 
 
-
     @ManyToOne
     @JoinColumn(name="roomBed", referencedColumnName = "Room_Key")
     @JsonIdentityReference(alwaysAsId = true)
     private Room roomBed;
+
+   /* @ManyToOne
+    @JoinColumn(name="BedLocled_ref", referencedColumnName = "BedLocked_Ky")
+    @JsonIdentityReference(alwaysAsId = true)
+    private BedLocked bed;*/
+
+    @OneToMany(mappedBy = "bed",cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<BedLocked> bedLockeds;
+
+    public List<BedLocked> getBedLockeds() {
+        return bedLockeds;
+    }
+
+    public void setBedLockeds(List<BedLocked> bedLockeds) {
+        this.bedLockeds = bedLockeds;
+    }
 
     //@JsonIgnore
     @OneToMany(mappedBy = "bed",cascade = CascadeType.ALL)
@@ -102,9 +117,6 @@ public class Bed {
     @JsonIgnore
     @Transient
     private List<Long> deletedEquipmentIds;
-    
-  
-    
 
     public Integer getBedKey() {
         return bedKey;
@@ -225,4 +237,25 @@ public class Bed {
         this.deletedEquipmentIds = deletedEquipmentIds;
     }
 
+    @Override
+    public String toString() {
+
+        return "Bed{" +
+                "bedKey=" + bedKey +
+                ", bedNumber=" + bedNumber +
+                ", bedType=" + bedType +
+                ", bedStatue=" + bedStatue +
+                ", bedDescription='" + bedDescription + '\'' +
+                ", physicalState=" + physicalState +
+                ", bedPurchaseDate=" + bedPurchaseDate +
+                ", bedCleaningStatus=" + bedCleaningStatus +
+                ", expirationDate=" + expirationDate +
+                ", RemainingLifeSpan=" + RemainingLifeSpan +
+                ", poids=" + poids +
+
+
+
+
+                '}';
+    }
 }

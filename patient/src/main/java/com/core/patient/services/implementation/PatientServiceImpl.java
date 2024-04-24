@@ -115,6 +115,53 @@ public class PatientServiceImpl implements PatientService {
     public List<Patient>searchPatientByFullConditions(String patientFirstName, String patientLastName, Gender patientGender,Date DOB){
         return patientRepository.findByPatientFirstNameAndPatientLastNameAndPatientGenderAndPatientBirthDate(patientFirstName,patientLastName,patientGender,DOB);
     }
-	
+    @Override
+    public void savePatientData(List<Patient> patientList) {
+        for (Patient patient : patientList) {
+            // Vérifier si l'email est unique
+            if (!isEmailUnique(patient, patient.getEmail())) {
+                // Gérer le cas où l'email n'est pas unique
+                throw new IllegalArgumentException("L'email du patient n'est pas unique : " + patient.getEmail());
+            }
+
+            // Vérifier si l'identité est unique
+            if (!isIdentityUnique(patient, patient.getPatientIdentityNumber())) {
+                // Gérer le cas où l'identité n'est pas unique
+                throw new IllegalArgumentException("L'identité du patient n'est pas unique : " + patient.getPatientIdentityNumber());
+            }
+
+            // Si l'email et l'identité sont uniques, enregistrer le patient
+            patientRepository.save(patient);
+        }
+    }
+
+
+    // Méthode pour vérifier si l'email est unique
+    private boolean isEmailUnique(Patient patient,String email) {
+        Patient aPatientEmail=patientRepository.findByEmail(email);
+if(aPatientEmail!=null) {
+    if(aPatientEmail.getPatientKey()!=patient.getPatientKey()){
+        return  false;
+    }
+
+
+}
+return  true;
+}
+
+
+    // Méthode pour vérifier si l'identité est unique
+    private boolean isIdentityUnique(Patient patient,String identity) {
+        Patient aPatientIdentity=patientRepository.findByPatientIdentityNumber(identity);
+        if(aPatientIdentity!=null) {
+            if(aPatientIdentity.getPatientKey()!=patient.getPatientKey()){
+                return  false;
+            }
+
+
+        }
+        return  true;
+    }
+
 
 }

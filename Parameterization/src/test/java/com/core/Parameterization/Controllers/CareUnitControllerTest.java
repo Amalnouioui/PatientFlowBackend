@@ -58,7 +58,7 @@ class CareUnitControllerTest {
         careUnit.setCareunitDescription("neww careunit for test");
         careUnit.setCareunitResponsable("Doc ahmed");
         careUnit.setCareunitCapacity(5);
-        careUnit.setCareuniType(UnitType.Intensifs);
+        careUnit.setCareuniType(UnitType.Cherugie);
         careUnit.setCareunitStatue(UnitStatus.InACTIVE);
         long currentTimeMillis = System.currentTimeMillis();
         careUnit.setCareUnit_StartTime(new Timestamp(currentTimeMillis));

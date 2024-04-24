@@ -15,8 +15,4 @@ public enum BedType {
             return displayName;
         }
 
-
-
-
-
 }

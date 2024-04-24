@@ -26,7 +26,17 @@ public class BedController {
      private EquipmentService equipmentService;
 
      //////FIRST PART: BED /////////
+///SaveBed
+    @PostMapping("/saveBed")
+    public String saveBed(@RequestBody Bed iBed) {
+        try {
+            bedService.saveBed(iBed);
+            return (" Le lit a été ajouté avec succées ! ");
 
+        }catch(Exception e){
+            return (e.getMessage());
+        }
+    }
 
 
     //ADD Bed with  ADDING NEW EQUIPMENT
@@ -57,6 +67,7 @@ public class BedController {
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.convertValue(requestBody, Bed.class);
     }
+
 
 
     private List<Long> extractEquipmentIdsFromJson(Map<String, Object> requestBody) {
@@ -282,7 +293,16 @@ public class BedController {
        }
    }
 
-
+    @GetMapping("/getBedByPatientKey/{id}")
+    public ResponseEntity<Bed> getBedByPatientKey(@PathVariable("id") Integer id) {
+        Bed aBed = bedService.isPatientAssignedToBed(id);
+        if (aBed != null) {
+            return ResponseEntity.ok(aBed);
+        } else {
+            // Return a 404 Not Found status if the bed is not found
+            return ResponseEntity.notFound().build();
+        }
+    }
 
 
 }

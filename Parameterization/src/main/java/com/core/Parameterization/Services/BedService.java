@@ -1,17 +1,14 @@
 package com.core.Parameterization.Services;
 
 import com.core.Parameterization.Entities.*;
-import com.core.Parameterization.Entities.Enumeration.BedPhysicalCondition;
-import com.core.Parameterization.Entities.Enumeration.BedStatus;
-import com.core.Parameterization.Entities.Enumeration.BedType;
-import com.core.Parameterization.Entities.Enumeration.UnitStatus;
+import com.core.Parameterization.Entities.Enumeration.*;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 public interface BedService {
-
+void saveBed(Bed iBed);
     List<Bed> retrieveBeds();
 
     void create(Bed iBed);
@@ -33,7 +30,7 @@ public interface BedService {
 
     void updateEquipmentInBed(Integer iCareUnitId, List<Long> iOldEquipmentList, List<Long> iNewEquipmentList);
     void removeEquipmentFrombed(Integer iBedKey, Long iEquipmentId);
-
+    Bed isPatientAssignedToBed(Integer patientId);
 
 
 

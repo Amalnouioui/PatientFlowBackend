@@ -1,19 +1,13 @@
 package com.core.Parameterization.Controllers;
 
 
-import aj.org.objectweb.asm.TypeReference;
 import com.core.Parameterization.Entities.*;
-import com.core.Parameterization.Entities.Enumeration.RoomStatus;
-import com.core.Parameterization.Entities.Enumeration.ServiceType;
-import com.core.Parameterization.Entities.Enumeration.UnitStatus;
-import com.core.Parameterization.Entities.Enumeration.UnitType;
-import com.core.Parameterization.Respositories.CareUnitServiceLinkRepo;
+import com.core.Parameterization.Entities.Enumeration.*;
 import com.core.Parameterization.Services.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -24,22 +18,19 @@ import java.util.stream.Collectors;
 @RequestMapping("/parameterization/careunit")
 public class CareUnitController {
     @Autowired
-    private  CareUnitService careUnitService;
+    private CareUnitService careUnitService;
     @Autowired
-     private RoomService roomService;
+    private RoomService roomService;
     @Autowired
     private EquipmentService equipmentService;
-    @Autowired
-    private ServiceSer serviceSer;
-
-    @Autowired
-    private CareUnitServiceLinkService careUnitServiceLinkService;
+@Autowired
+private  BedLockedService bedLockedService;
 
     //ADD EQUIPMENT AND SERVICE TO CAREUNIT WHEN ADDING NEW CAREUNIT
     @PostMapping
 
-    public String createCareUnit(@RequestBody Map<String, Object> iRequestBody){
-        try{
+    public String createCareUnit(@RequestBody Map<String, Object> iRequestBody) {
+        try {
             // Extraire les données de l'unité de soin du JSON
             CareUnit aCareUnit = extractCareUnitFromJson(iRequestBody);
 
@@ -50,13 +41,12 @@ public class CareUnitController {
             List<Long> aEquipmentList = extractEquipmentIdsFromJson(iRequestBody);
 
 
-
             // Ajouter les équipements à l'unité de soin
             addEquipmentToCareUnit(aCareUnit, aEquipmentList);
 
-            return  ("l'unité de soin a été ajouté avec succées");
-        }catch(Exception e){
-            return  (e.getMessage());
+            return ("l'unité de soin a été ajouté avec succées");
+        } catch (Exception e) {
+            return (e.getMessage());
         }
     }
 
@@ -80,11 +70,7 @@ public class CareUnitController {
     }
 
 
-    //EXTRACT ServiceEntity FROM THE BODY
-  /*  private ServiceEntity extractSeriveEntityFroJson(Map<String, Object> requestBody) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.convertValue(requestBody, ServiceEntity.class);
-    }*/
+    //ADD CAREUNIT , EQUIPMENT AND SERVICE
     private void addEquipmentToCareUnit(CareUnit iCareUnit, List<Long> iEquipmentList) {
         // Ajouter les équipements à l'unité de soin
         for (Long aEquipmentId : iEquipmentList) {
@@ -110,52 +96,51 @@ public class CareUnitController {
     // RETRIVE ALL CAREUNITS
     @GetMapping
 
-    public ResponseEntity <List<CareUnit>> getAllCareUnit(){
-    try
-    {
-            List<CareUnit> aAllCareUnits =careUnitService.retreivesAllCareUnits();
+    public ResponseEntity<List<CareUnit>> getAllCareUnit() {
+        try {
+            List<CareUnit> aAllCareUnits = careUnitService.retreivesAllCareUnits();
 
-            return new ResponseEntity<>(aAllCareUnits,HttpStatus.OK);
-    }catch(Exception e){
-        return  new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(aAllCareUnits, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 
         }
     }
 
     //RETREIVE CAREUNIT BY ITS ID
     @GetMapping("/{id}")
-        public ResponseEntity<CareUnit>getCareUnitById(@PathVariable ("id") Integer iCareunitKey){
-            Optional<CareUnit>aCareUnit=careUnitService.getCareUnitByKey(iCareunitKey);
-            return aCareUnit.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
-                    .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    public ResponseEntity<CareUnit> getCareUnitById(@PathVariable("id") Integer iCareunitKey) {
+        Optional<CareUnit> aCareUnit = careUnitService.getCareUnitByKey(iCareunitKey);
+        return aCareUnit.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
 
 
-        }
+    }
 
     // RETREIVE CAREUNIT BY ITS NAME
 
     @GetMapping("/careunitName/{careunitName}")
-    public ResponseEntity<CareUnit>getCareUnitByName(@PathVariable ("careunitName")String iCareunitName){
-        CareUnit aCareUnit=careUnitService.getCareUnitbyNme(iCareunitName);
-    if (aCareUnit!=null){
-            return  new ResponseEntity<>(aCareUnit,HttpStatus.OK);
-        }else {
-            return  new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<CareUnit> getCareUnitByName(@PathVariable("careunitName") String iCareunitName) {
+        CareUnit aCareUnit = careUnitService.getCareUnitbyNme(iCareunitName);
+        if (aCareUnit != null) {
+            return new ResponseEntity<>(aCareUnit, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
 
-
     // RETREIVE CAREUNITS BY THEIR STATUS
     @GetMapping("/careunitStatue/{careunitStatue}")
-            public ResponseEntity<List<CareUnit>>getCareUnitStatue(@PathVariable("careunitStatue") UnitStatus iCareunitStatue){
-        List<CareUnit> aCareUnit=careUnitService.getCareUnitByStatue(iCareunitStatue);
-        if (aCareUnit!=null){
-            return  new ResponseEntity<>(aCareUnit,HttpStatus.OK);
-        }else {
-            return  new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<List<CareUnit>> getCareUnitStatue(@PathVariable("careunitStatue") UnitStatus iCareunitStatue) {
+        List<CareUnit> aCareUnit = careUnitService.getCareUnitByStatue(iCareunitStatue);
+        if (aCareUnit != null) {
+            return new ResponseEntity<>(aCareUnit, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        }}
+        }
+    }
 
 
     // UPDATE CAREUNIT
@@ -163,19 +148,18 @@ public class CareUnitController {
     public String ChangeCareUnit(@PathVariable("careunitKey") Integer iCareunitKey, @RequestBody CareUnit iNewCareUnit) {
         try {
             careUnitService.update(iCareunitKey, iNewCareUnit);
-            return("l'unite de soin a été mis a jour avec succées ");
+            return ("l'unite de soin a été mis a jour avec succées ");
         } catch (Exception e) {
             return (e.getMessage());
         }
     }
 
 
-
-   //DELETE CAREUNIT WITH THE EQUIPMENT AND SERVICE ASSOCIATION
+    //DELETE CAREUNIT WITH THE EQUIPMENT AND SERVICE ASSOCIATION
     @DeleteMapping("/{id}")
     public String deleteCareUnitAndAssociatedEntities(@PathVariable("id") Integer iId) {
-        try{
-        Optional<CareUnit> aExistingCareUnitOptional = careUnitService.getCareUnitByKey(iId);
+        try {
+            Optional<CareUnit> aExistingCareUnitOptional = careUnitService.getCareUnitByKey(iId);
             CareUnit aExistingCareUnit = aExistingCareUnitOptional.get();
 
             // Remove associated Equipments
@@ -184,14 +168,14 @@ public class CareUnitController {
             }
 
 
-
             // Delete the CareUnit
             careUnitService.delete(iId);
 
             return ("L'unite de soin a été supprimé avec succées ");
-            }catch(Exception e){
-            return (e.getMessage());}}
-
+        } catch (Exception e) {
+            return (e.getMessage());
+        }
+    }
 
 
     //Search
@@ -205,38 +189,33 @@ public class CareUnitController {
 
 
     //ADD  ROOM IN CAREUNI
-
     @PostMapping("/{id}/AddRoom")
-    public String addRoomToCareUnit(@PathVariable ("id") Integer iCareunitKey , @RequestBody Room iRoom){
+    public String addRoomToCareUnit(@PathVariable("id") Integer iCareunitKey, @RequestBody Room iRoom) {
         try {
             Optional<CareUnit> aCareUnit = careUnitService.getCareUnitByKey(iCareunitKey);
 
-            if (aCareUnit.isPresent() ) {
+            if (aCareUnit.isPresent()) {
 
-                CareUnit aCareuniCapacity=aCareUnit.get();
+                CareUnit aCareuniCapacity = aCareUnit.get();
                 careUnitService.addRoom(aCareUnit.get(), iRoom);
                 return ("la chambre a été ajouté  avec succées ");
             } else {
-                return("Aucune unité de soin existe avec cet ID !");
+                return ("Aucune unité de soin existe avec cet ID !");
             }
-        }catch(Exception e){
-            return  (e.getMessage());
+        } catch (Exception e) {
+            return (e.getMessage());
         }
     }
 
 
-
-
-
-
     // RETREIVE ALL ROOMS ASSOCIATED WITH CAREUNIT
     @GetMapping("/{id}/GetRoom")
-    public ResponseEntity<List<Room>>GetRoomListByCareUnit(@PathVariable("id")Integer iCareunitKey){
-        Optional<CareUnit>aCareUnit=careUnitService.getCareUnitByKey(iCareunitKey);
-        if(aCareUnit.isPresent()){
-            List<Room>aRooms=careUnitService.getRoom(aCareUnit.get());
-            return new ResponseEntity<>(aRooms,HttpStatus.OK);
-        }else{
+    public ResponseEntity<List<Room>> GetRoomListByCareUnit(@PathVariable("id") Integer iCareunitKey) {
+        Optional<CareUnit> aCareUnit = careUnitService.getCareUnitByKey(iCareunitKey);
+        if (aCareUnit.isPresent()) {
+            List<Room> aRooms = careUnitService.getRoom(aCareUnit.get());
+            return new ResponseEntity<>(aRooms, HttpStatus.OK);
+        } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
@@ -265,7 +244,7 @@ public class CareUnitController {
     }
 
 
-    /////RETREIVE  ROOM BY STATUS IN A SPECIFIC  CEUNIT
+    /////RETREIVE  ROOM BY STATUS IN A SPECIFIC  CAREUNIT
     @GetMapping("/{careunitKey}/roomStatue/{roomStatue}")
     public ResponseEntity<List<Room>> getRoomByStatus(
             @PathVariable("careunitKey") Integer iCareUnitKey,
@@ -299,20 +278,16 @@ public class CareUnitController {
     }
 
 
-
-
-
     // Mise à jour de la méthode pour retourner un message personnalisé
     @CrossOrigin(origins = "http://localhost:4200")
     @PutMapping("/{careunitKey}/UpdateRoom/{roomKey}")
-
-    public  String updateRoomInCareUnit(
+    public String updateRoomInCareUnit(
             @PathVariable("careunitKey") Integer iCareunitKey,
             @PathVariable("roomKey") Integer iRoomKey,
             @RequestBody Room iNewRoom) {
 
         Optional<CareUnit> aCareUnitOptional = careUnitService.getCareUnitByKey(iCareunitKey);
-        if(aCareUnitOptional.isPresent()) {
+        if (aCareUnitOptional.isPresent()) {
             Optional<Room> aRoomOptional = roomService.getRoomByKey(iRoomKey);
 
             if (aRoomOptional.isPresent()) {
@@ -338,14 +313,14 @@ public class CareUnitController {
                     return ("La chambre a été mis a jour avec succeés ! ");
                 } catch (Exception e) {
                     // Gérez l'erreur de manière appropriée (par exemple, journalisez l'erreur, renvoyez une réponse d'erreur)
-                    return("Echéc de mise à  jour "+e.getMessage());
+                    return ("Echéc de mise à  jour " + e.getMessage());
                 }
             } else {
                 // Salle avec le roomKey donné non trouvée
-                return("la chambre n'existe pas !");
+                return ("la chambre n'existe pas !");
             }
         } else {
-            return("L'unité de soin n'existe pas ");
+            return ("L'unité de soin n'existe pas ");
         }
     }
 
@@ -353,36 +328,37 @@ public class CareUnitController {
     //// DELETE  A ROOM fROM A CAREUNIT
     @DeleteMapping("/{id}/deleteRoom/{roomkey}")
     public String deleteRoomFromCareUnit(@PathVariable("id") Integer iCareUnitKey, @PathVariable("roomkey") Integer iRoomKey) {
-        try{
-        Optional<CareUnit> aCareUnitOptional = careUnitService.getCareUnitByKey(iCareUnitKey);
+        try {
+            Optional<CareUnit> aCareUnitOptional = careUnitService.getCareUnitByKey(iCareUnitKey);
 
-        if (aCareUnitOptional.isPresent()) {
-            CareUnit aCareUnit = aCareUnitOptional.get();
+            if (aCareUnitOptional.isPresent()) {
+                CareUnit aCareUnit = aCareUnitOptional.get();
 
-            // Recherche de la salle par son ID
-            Optional<Room> aRoomOptional = aCareUnit.getRooms().stream()
-                    .filter(room -> room.getRoomKey().equals(iRoomKey))
-                    .findFirst();
+                // Recherche de la salle par son ID
+                Optional<Room> aRoomOptional = aCareUnit.getRooms().stream()
+                        .filter(room -> room.getRoomKey().equals(iRoomKey))
+                        .findFirst();
 
-            if (aRoomOptional.isPresent()) {
-                Room aRoom = aRoomOptional.get();
-                // Suppression de la salle de l'unité de soins
-                aCareUnit.getRooms().remove(aRoom);
-                // Suppression de la salle de l'unité de soins
-                roomService.deleteRoom(aRoom);
+                if (aRoomOptional.isPresent()) {
+                    Room aRoom = aRoomOptional.get();
+                    // Suppression de la salle de l'unité de soins
+                    aCareUnit.getRooms().remove(aRoom);
+                    // Suppression de la salle de l'unité de soins
+                    roomService.deleteRoom(aRoom);
 
-                // Mettez à jour l'unité de soins dans la base de données
-                careUnitService.updateCareUnit(aCareUnit);
+                    // Mettez à jour l'unité de soins dans la base de données
+                    careUnitService.updateCareUnit(aCareUnit);
 
-                return ("La chambre a été supprimé avec succées !");
+                    return ("La chambre a été supprimé avec succées !");
+                } else {
+                    // La salle avec l'ID donné n'a pas été trouvée dans l'unité de soins
+                    return ("La chambre n'existe pas dans cette unité ");
+                }
             } else {
-                // La salle avec l'ID donné n'a pas été trouvée dans l'unité de soins
-                return ("La chambre n'existe pas dans cette unité ");
+                // L'unité de soins avec l'ID donné n'a pas été trouvée
+                return ("L'unite de soin n'existe pas!");
             }
-        } else {
-            // L'unité de soins avec l'ID donné n'a pas été trouvée
-            return ("L'unite de soin n'existe pas!");
-        }}catch (Exception e){
+        } catch (Exception e) {
             return (e.getMessage());
         }
     }
@@ -391,48 +367,43 @@ public class CareUnitController {
     /////////    THIRD PART : CAREUNIT AND EQUIPMENTS ////////////////
 
 
-
     // ADD EQUIPMENT TO CAREUNIT
     @PostMapping("/{careUnitId}/equipments")
     public String addEquipmentToCareUnit(@PathVariable("careUnitId") Integer iCareUnitId, @RequestBody List<Long> iEquipmentList) {
-        try{
-        // Récupérer l'unité de soin par son ID
-        Optional<CareUnit> aCareUnitOptional = careUnitService.getCareUnitByKey(iCareUnitId);
-        if (aCareUnitOptional.isEmpty()) {
-            return ("Aucune unité de soin existe avec cet ID !");
-        }
-
-        CareUnit aCareUnit = aCareUnitOptional.get();
-
-        // Parcourir la liste des IDs d'équipements et les associer à l'unité de soin
-        for (Long aEquipmentId : iEquipmentList) {
-            // Récupérer l'équipement par son ID
-            Optional<Equipment> aEquipmentOptional = equipmentService.getEquipmentById(aEquipmentId);
-            if (aEquipmentOptional.isEmpty()) {
-                return ("Aucun equipemnt existe avec cet ID");
+        try {
+            // Récupérer l'unité de soin par son ID
+            Optional<CareUnit> aCareUnitOptional = careUnitService.getCareUnitByKey(iCareUnitId);
+            if (aCareUnitOptional.isEmpty()) {
+                return ("Aucune unité de soin existe avec cet ID !");
             }
 
-            Equipment aEquipment = aEquipmentOptional.get();
+            CareUnit aCareUnit = aCareUnitOptional.get();
 
-            // Créer une association entre l'unité de soin et l'équipement
-            CareUnitEquipLink aAssociation = new CareUnitEquipLink();
-            aAssociation.setCareUnit(aCareUnit);
-            aAssociation.setEquipment(aEquipment);
+            // Parcourir la liste des IDs d'équipements et les associer à l'unité de soin
+            for (Long aEquipmentId : iEquipmentList) {
+                // Récupérer l'équipement par son ID
+                Optional<Equipment> aEquipmentOptional = equipmentService.getEquipmentById(aEquipmentId);
+                if (aEquipmentOptional.isEmpty()) {
+                    return ("Aucun equipemnt existe avec cet ID");
+                }
 
-            // Enregistrer l'association
-            careUnitService.addEquipmentToCareUnit(aAssociation);
+                Equipment aEquipment = aEquipmentOptional.get();
+
+                // Créer une association entre l'unité de soin et l'équipement
+                CareUnitEquipLink aAssociation = new CareUnitEquipLink();
+                aAssociation.setCareUnit(aCareUnit);
+                aAssociation.setEquipment(aEquipment);
+
+                // Enregistrer l'association
+                careUnitService.addEquipmentToCareUnit(aAssociation);
 
 
-        }
-        return ("les Equipements ont été ajouté succées !");
-    }catch(Exception e){
+            }
+            return ("les Equipements ont été ajouté succées !");
+        } catch (Exception e) {
             return (e.getMessage());
         }
     }
-
-
-
-
 
 
     // GET ALL THE  EQUIPMENTS FROM CAREUNIT
@@ -441,14 +412,23 @@ public class CareUnitController {
         Optional<CareUnit> aOptionalCareUnit = careUnitService.getCareUnitByKey(iCareUnitId);
         if (aOptionalCareUnit.isPresent()) {
             return careUnitService.getEquipmentsByCareUnit(iCareUnitId);
-        }else{
-            throw  new IllegalStateException("Aucune unité existe avec cet ID ");
+        } else {
+            throw new IllegalStateException("Aucune unité existe avec cet ID ");
         }
 
     }
 
 
-
+    // UPDATE EQUIPMENTS IN CAREUNIT
+    @PutMapping("/{careUnitId}/updateEquipment")
+    public ResponseEntity<String> updateEquipmentInCareUnitPost(@PathVariable("careUnitId") Integer iCareUnitId, @RequestBody UpdateEquipmentRequest iRequest) {
+        try {
+            careUnitService.updateEquipmentInCareUnit(iCareUnitId, iRequest.getOldEquipmentIds(), iRequest.getNewEquipmentIds());
+            return new ResponseEntity<>("L'equipement a été mis a jour avec succées ", HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>("Echéc de mis a jour cet equipement " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
 
     // DELETE EQUIPMENT FROM CAREUNIT
@@ -459,115 +439,96 @@ public class CareUnitController {
             careUnitService.removeEquipmentFromCareUnit(iCareUnitId, iEquipmentList);
             return ("L'equipement a été supprimé avec succées ");
         } catch (IllegalArgumentException e) {
-            return ("Echéc de supprimer un equipement "+e.getMessage());
+            return ("Echéc de supprimer un equipement " + e.getMessage());
         }
     }
 
 
 
-
-
-    ////////////////
-    @GetMapping("/getService/{Type}")
-    public ResponseEntity <List<ServiceEntity>> findByServiceType(@PathVariable("Type") ServiceType serviceType){
-        List<ServiceEntity>aServiceList=careUnitService.getServicebyType(serviceType);
-        if(aServiceList.isEmpty()){
-            return new  ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }else{
-            return new ResponseEntity<>(aServiceList,HttpStatus.OK);
-        }
-    }
-
-    //////////  FOURTH PART : CAREUNIT AND SERVICE ///////////
-
-
-    // ADD SERVICE TO CAREUNIT
-/*
-    @PostMapping("/{careUnitId}/services")
-    public String addServicesToCareUnit(@PathVariable("careUnitId") Integer iCareUnitId, @RequestBody List<Long> iServiceList) {
-       try{
-        // Récupérer l'unité de soin par son ID
-        Optional<CareUnit> careUnitOptional = careUnitService.getCareUnitByKey(iCareUnitId);
-        if (careUnitOptional.isEmpty()) {
-            return ("Aucune unité de soin existe avec cet ID");
-        }
-
-        CareUnit aCareUnit = careUnitOptional.get();
-        List<String> errorMessages = new ArrayList<>();
-
-        // Parcourir la liste des IDs d'équipements et les associer à l'unité de soin
-        for (Long aServiceKey : iServiceList) {
-
-            // Récupérer l'équipement par son ID
-            Optional<ServiceEntity> aServiceEntityOptional = serviceSer.getServiceById(aServiceKey);
-            if (aServiceEntityOptional.isEmpty()) {
-               errorMessages.add("Aucun Service existe avec L'ID :"+aServiceKey);
-                continue;
-            }
-
-            ServiceEntity aService = aServiceEntityOptional.get();
-
-
-
-            List<CareUnitServiceLink> aCareunitServiceList = careUnitServiceLinkService.getCareUnitAndService(iCareUnitId, aServiceKey);
-            if (!aCareunitServiceList.isEmpty()) {
-               errorMessages.add("Le service avec l'ID " + aServiceKey + " existe déjà dans cette unité de soin !");
-               continue;
-            }
-                // Créer une association entre l'tunité de soin et l'équipement
-                CareUnitServiceLink aAssociation = new CareUnitServiceLink();
-                aAssociation.setCareUnit(aCareUnit);
-                aAssociation.setService(aService);
-                // Enregistrer l'association
-                careUnitService.addServices(aAssociation);
-
-        }if (!errorMessages.isEmpty()){
-               return "Échec d'ajouter des services : " + String.join(", ", errorMessages);
-           }
-           return "Les services ont été ajoutés avec succès !";
-    }catch(Exception e ){
-           return("Echéc d'ajouter des sevices : "+e.getMessage());
-       }
-    }
-
-
-    // GET SERVICES FROM A SPECIFIC  CAREUNIT
-    @GetMapping("/{careUnitId}/getServices")
-    public Set<CareUnitServiceLink> getServicesByCareUnit(@PathVariable("careUnitId") Integer iCareUnitId) {
-        Optional<CareUnit> aOptionalCareUnit = careUnitService.getCareUnitByKey(iCareUnitId);
-        if (aOptionalCareUnit.isPresent()) {
-            return careUnitService.getServicesByCareUnit(iCareUnitId);
-        }else{
-            throw  new IllegalStateException("Aucune unité de soin existe avec cet ID\"");
-        }
-    }
-
-
-    // UPDATE SERVICE IN CAREUNIT
-
-    @PutMapping("/{careUnitId}/ypdateService")
-    public ResponseEntity<String> updateServiceICareUnit(@PathVariable("careUnitId") Integer iCareUnitId, @RequestBody UpdatedServiceRequest iRequest) {
+    @GetMapping("/getRooms")
+    public ResponseEntity<?> getAllRooms(@RequestParam Integer careunitKey,
+                                                  @RequestParam RoomType roomType,
+                                                  @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date bedLocked_PlannedUnxTmBgn,
+                                                  @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date bedLocked_PlannedUnxTmEnd,
+                                                  @RequestParam double patientWeight,
+                                                    @RequestParam boolean accompagnement
+    ) {
         try {
-            careUnitService.updateService(iCareUnitId, iRequest.getOldServiceId(), iRequest.getNewServiceId());
-            return new ResponseEntity<>("Le service a été mis a jour avec succées", HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>("Echec de mis a jour cet equipement "+e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            List<Room> aRoomList = careUnitService.getRoomsInCareUnit(careunitKey, roomType, bedLocked_PlannedUnxTmBgn, bedLocked_PlannedUnxTmEnd, patientWeight,accompagnement);
+            if (!aRoomList.isEmpty()) {
+                return new ResponseEntity<>(aRoomList, HttpStatus.OK);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Aucune chambre disponible pour les critères spécifiés.");
+            }
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
 
-    // DELETE A SPECIFIC SERVICE FROM A SPECIFIC CAREUNIT
 
-    @DeleteMapping("/{careUnitId}/deleteservice/{serviceKey}")
-    public String removeServiceFromCareUnit(@PathVariable("careUnitId") Integer iCareUnitId, @PathVariable("serviceKey") Long iServiceKey) {
+
+
+
+
+
+
+
+
+
+
+
+  /*  @PostMapping("/saveBedLockedWithAccompagnant")
+    public ResponseEntity<String> saveBedLockedWithAccompagnant(@RequestParam Integer roomKey, @RequestBody CompanionAndBedLockRequest request) {
         try {
-            careUnitService.removeService(iCareUnitId, iServiceKey);
-            return ("Le setvice a été supprimé avec succées !");
-        } catch (IllegalArgumentException e) {
-            return ("Echec de supprimer le service"+e.getMessage());
+            RoomC accompagnant = request.getCompanion();
+            roomCompanionService.addCompanion(accompagnant);
+            Integer accompagnantId = accompagnant.getRoomCompanionKy();
+
+            BedLocked bedLocked = request.getBedLocked();
+            bedLocked.setBedLockedOccupantKy(accompagnantId);
+
+            ResponseEntity<Room> response = restTemplate.getForEntity(paramServiceUrl + "/{id}", Room.class, roomKey);
+
+            if (response.getStatusCode().is2xxSuccessful()) {
+                Room room = response.getBody();
+                List<Bed> bedList = room.getRoomBed();
+
+                for (Bed bed : bedList) {
+                    if (bed.getBedType() == BedType.Simple) {
+                        bedLocked.setBed(bed);
+                        ResponseEntity<BedLocked> bedLockedResponse = restTemplate2.postForEntity(paramBedLockedUrl, bedLocked, BedLocked.class);
+
+
+
+                        if (!bedLockedResponse.getStatusCode().is2xxSuccessful()) {
+                            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors de l'enregistrement de BedLocked.");
+                        }
+
+                        bed.setBedStatue(BedStatus.Reserve);
+                        bed.setRoomBed(room);
+                        HttpHeaders headers = new HttpHeaders();
+                        headers.setContentType(MediaType.APPLICATION_JSON);
+                        HttpEntity<Bed> requestEntity = new HttpEntity<>(bed, headers);
+                        ResponseEntity<String> bedResponseEntity = restTemplate.postForEntity(paramBedUrl, requestEntity, String.class);
+
+                        if (!bedResponseEntity.getStatusCode().is2xxSuccessful()) {
+                            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors de la sauvegarde du lit.");
+                        }
+                    }
+                }
+
+                return ResponseEntity.ok("Accompagnant a été enregistré avec succès.");
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("La chambre avec l'ID " + roomKey + " n'a pas été trouvée.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors de l'enregistrement de BedLocked avec accompagnant: " + e.getMessage());
         }
     }
 */
+
 }
 
 

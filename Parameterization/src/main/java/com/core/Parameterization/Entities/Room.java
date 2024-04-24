@@ -45,11 +45,6 @@ public class Room {
     public void setRoomResponsible(String roomResponsible) {
         this.roomResponsible = roomResponsible;
     }
-    
-    @ManyToOne
-    @JoinColumn(name = "service_ky", referencedColumnName = "service_Ky")
-    @JsonIdentityReference(alwaysAsId = true)
-    private ServiceEntity service;
 
    @ManyToOne
    @JoinColumn(name = "CareUnit_Ref", referencedColumnName = "CareUnit_key")
@@ -124,14 +119,6 @@ public class Room {
     public void setRoomBed(List<Bed> roomBed) {
         this.roomBed = roomBed;
     }
-
-	public ServiceEntity getService() {
-		return service;
-	}
-
-	public void setService(ServiceEntity service) {
-		this.service = service;
-	}
 
 
 }

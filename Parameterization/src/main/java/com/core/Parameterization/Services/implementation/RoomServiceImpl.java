@@ -41,7 +41,7 @@ import java.util.*;
             if (iRoom.getRoomType() == RoomType.Simple && aRoomCapacity != 1) {
                 throw new IllegalStateException("La capacité d'une chambre simple doit être de 1");
             }
-            else if (iRoom.getRoomType() == RoomType.Double && aRoomCapacity != 2 ) {
+             else if (iRoom.getRoomType() == RoomType.Double && aRoomCapacity != 2 ) {
                 throw new IllegalStateException("La capacité d'une chambre double doit être de 2");
             }
             else if (iRoom.getRoomType() == RoomType.COLLECTIVE && aRoomCapacity < 3) {
@@ -107,8 +107,6 @@ import java.util.*;
         aExistingRoom.setRoomType(iNewRoom.getRoomType());
         aExistingRoom.setCleaningState(iNewRoom.getCleaningState());
         aExistingRoom.setRoomResponsible(iNewRoom.getRoomResponsible());
-        aExistingRoom.setService(iNewRoom.getService());
-
 
         roomRepository.save(aExistingRoom);
     }

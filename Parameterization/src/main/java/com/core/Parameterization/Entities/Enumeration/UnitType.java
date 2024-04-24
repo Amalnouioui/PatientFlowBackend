@@ -1,10 +1,10 @@
 package com.core.Parameterization.Entities.Enumeration;
 
 public enum UnitType {
-    Intensifs("Unité de soins intensifs"),
-  Intermediaires("Unité de soins intermédiaires"),
-  A_Long_Terme("A Long Terme");
-
+    Medecine_General("GeneralMedicine"),
+    Cherugie("Surgery"),
+    Pediatrie("Pediatrics"),
+    Gynecologie("Gynecology");
 
     private final String value;
 

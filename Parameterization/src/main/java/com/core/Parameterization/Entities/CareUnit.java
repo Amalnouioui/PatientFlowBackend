@@ -3,7 +3,6 @@ package com.core.Parameterization.Entities;
 import com.core.Parameterization.Entities.Enumeration.UnitStatus;
 import com.core.Parameterization.Entities.Enumeration.UnitType;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
@@ -70,34 +69,17 @@ public class CareUnit {
     @JsonIgnore
     private List<Long> equipmentList;
 
-
-    @JsonIgnore
     @Transient
-    private List<Long> deletedEquipmentIds;
-
-
-
-
-
+    @JsonIgnore
+    private List<Long> serviceList;
 
     //@JsonIgnore
     @Getter
     @OneToMany(mappedBy = "careUnit",cascade = CascadeType.ALL)
     Set<CareUnitEquipLink> careUnitEquipLinkSet;
 
-    @ManyToOne
-    @JoinColumn(name = "Service_Ref", referencedColumnName = "Service_Ky")
-    @JsonIdentityReference(alwaysAsId = true)
-    private  ServiceEntity serviceCareunits;
 
 
-    public ServiceEntity getServiceCareunits() {
-        return serviceCareunits;
-    }
-
-    public void setServiceCareunits(ServiceEntity serviceCareunits) {
-        this.serviceCareunits = serviceCareunits;
-    }
 
     @OneToMany(mappedBy = "careunitRoom",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<Room>rooms;
@@ -152,6 +134,7 @@ public class CareUnit {
 
         // Concaténer les informations dans le format désiré
         return startDay + "A" + endDay + "_" + startTimeStr + "_" + endTimeStr;
+
     }
 
     public void setOperationhoure(String operationhoure) {
@@ -232,13 +215,11 @@ public class CareUnit {
     }
 
 
-    public List<Long> getDeletedEquipmentIds() {
-        return deletedEquipmentIds;
-    }
 
-    public void setDeletedEquipmentIds(List<Long> deletedEquipmentIds) {
-        this.deletedEquipmentIds = deletedEquipmentIds;
-    }
+
+
+
+
 
 
 }

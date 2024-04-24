@@ -48,7 +48,7 @@ public class PatientController {
 	    public String createPatient(@RequestBody Patient patient) {
 	        try {
 	            patientService.createPatient(patient);
-	            return("Patient enrigistré ");
+	            return("Patient a été enrigistré succées  ");
 	            
 	        } catch(Exception e){
 	            return (e.getMessage());
@@ -59,7 +59,7 @@ public class PatientController {
 	    public String updatePatient(@PathVariable("id") int id, @RequestBody Patient updatedPatient) {
 	        try {
 	            patientService.updatePatient(id, updatedPatient);
-	            return("les information de ce patient sont modifié ");
+	            return("les informations de ce patient sont modifiés ");
 	        } catch (Exception e) {
 	            return (e.getMessage());
 	        }
@@ -107,9 +107,20 @@ public class PatientController {
 			@RequestParam(name = "patientFirstName", required = true) String patientFirstName,
 			@RequestParam(name = "patientLastName", required = true) String patientLastName,
 			@RequestParam(name = "patientGender", required = true) Gender patientGender,
-			@RequestParam(name = "patientBirthDate", required = true)  @DateTimeFormat(pattern = "yyyy-MM-dd") Date patientBirthDate){
+			@RequestParam(name = "patientBirthDate", required = true)  @DateTimeFormat(pattern = "dd-MM-yyyy") Date patientBirthDate){
 		List<Patient> patients = patientService.searchPatientByFullConditions(patientFirstName, patientLastName,patientGender,patientBirthDate);
 		return new ResponseEntity<>(patients, HttpStatus.OK);
+	}
+
+
+	@PostMapping("/savePatientData")
+	public String savePatientData(@RequestBody List<Patient> patients) {
+		 try {
+			 patientService.savePatientData(patients);
+			 return "Data des patients est enregistré avec sucées";
+		 }catch(Exception e){
+			 return e.getMessage();
+		 }
 	}
 
 }
