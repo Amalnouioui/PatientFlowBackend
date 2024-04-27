@@ -17,16 +17,15 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Entity
 @Table(name = "Patient")
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "Patient_Key")
+
 public class Patient {
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -85,15 +84,14 @@ public class Patient {
 
 
 
-
+    @JsonIgnore
     @OneToMany(mappedBy = "patient",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<Historique> historiques;
 
-
-
-    @JsonIgnore
-    @OneToMany(mappedBy = "patient")
-    Set<Rapport> rapports;
+   // @JsonIgnore
+    @Getter
+    @OneToMany(mappedBy = "patient",cascade = CascadeType.ALL,orphanRemoval = true)
+    private Set<Rapport>rapportset;
 
 
 

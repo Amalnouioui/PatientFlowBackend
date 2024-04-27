@@ -8,6 +8,7 @@ import com.core.patient.services.HistorqueService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -22,12 +23,12 @@ public class HistoriqueImpl implements HistorqueService {
 
     }
     @Override
-    public  Historique getHisory(Integer patientKey){
+    public  List<Historique> getHisory(Integer patientKey){
         Optional<Patient> patientOptional=patientRepository.findById(patientKey);
         if(patientOptional.isPresent()){
-            Patient patient=patientOptional.get();
-            Historique historique=historiqueRepository.findByPatient(patient);
-            return historique;
+
+             List<Historique> historique = historiqueRepository.findByPatient(patientOptional.get());
+             return historique;
 
         }
         throw new IllegalStateException("patient n'existe pas!") ;

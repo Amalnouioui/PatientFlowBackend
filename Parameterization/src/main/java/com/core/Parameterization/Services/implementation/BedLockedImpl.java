@@ -7,6 +7,7 @@ import com.core.Parameterization.Respositories.BedRespository;
 import com.core.Parameterization.Respositories.RoomCompanionRepository;
 import com.core.Parameterization.Respositories.RoomRepository;
 import com.core.Parameterization.Services.BedLockedService;
+import com.core.Parameterization.Services.RoomCompanionService;
 import com.core.patient.entities.Historique;
 import com.core.patient.entities.Patient;
 import jakarta.transaction.Transactional;
@@ -30,7 +31,7 @@ public class BedLockedImpl implements BedLockedService {
     @Autowired
     private BedRespository bedRespository;
     @Autowired
-    private RoomCompanionRepository roomCompanionRepository;
+    private RoomCompanionService roomCompanionService;
 
     @Override
     public void addPerson(BedLocked bedLocked) {
@@ -299,8 +300,8 @@ public class BedLockedImpl implements BedLockedService {
                                     return;
 
                                 }
-                                System.out.println(isBedInBedLocked(abed));
-                                System.out.println(checkdates(abed, patientEntry, patientExit));
+                                System.out.println("appartient a bedLocked " + isBedInBedLocked(abed));
+                                System.out.println("reservation de lit" + checkdates(abed, patientEntry, patientExit));
 
                             } else if (!isBedInBedLocked(abed) && verifyGoodRoomCondition(abed, patientWeight)) {
                                 assignPersonToBed(bedLocked, abed);
@@ -488,13 +489,157 @@ public class BedLockedImpl implements BedLockedService {
 
     }
 
-    String historySave ="http://localhost:8091/historique";
+    String historySave = "http://localhost:8091/historique";
     RestTemplate restTemplate = new RestTemplate();
-    String getPatient ="http://localhost:8091/patients/{patientKey}";
+    String getPatient = "http://localhost:8091/patients/{patientKey}";
+
     RestTemplate restTemplate2 = new RestTemplate();
 
-    @Override
+    /* @Override
+     public Bed changePatientBed(Integer roomKey, BedLocked newBedLocked, boolean accompagnement, double patientWeight) {
+         try {
+
+             bedLockedRepository.save(newBedLocked);
+
+             Optional<Room> optionalRoom = roomRepository.findById(roomKey);
+             if (optionalRoom.isPresent()) {
+                 Room room = optionalRoom.get();
+                 List<Bed> beds = room.getRoomBed();
+
+                 ////////chambre Double////
+                 if (room.getRoomType() == RoomType.Double) {
+                     if (accompagnement) {
+                         long simpleBedCount = 0;
+                         long medicalBedCount = 0;
+                         for (Bed abed : beds) {
+                             if (abed.getBedType() == BedType.Simple) {
+                                 simpleBedCount++;
+                             } else if (abed.getBedType() == BedType.Medicalise) {
+                                 medicalBedCount++;
+                             }
+                         }
+
+                         if (simpleBedCount == 1 && medicalBedCount == 1) {
+                             for (Bed abed : beds) {
+                                 if (abed.getBedType() == BedType.Medicalise && newBedLocked.getBedLockedOccupantType() == OccupantType.Patient) {
+                                     assignPersonToBed(newBedLocked, abed);
+                                     return abed;
+                                 }
+                             }
+                         } else if (simpleBedCount == 2) {
+                             for (Bed abed : beds) {
+                                 if (abed.getBedType() == BedType.Simple && newBedLocked.getBedLockedOccupantType() == OccupantType.Patient) {
+                                     assignPersonToBed(newBedLocked, abed);
+                                     return abed;
+                                 }
+                             }
+                         } else {
+                             throw new IllegalStateException("La chambre double ne contient pas la configuration attendue de lits");
+                         }
+                     } else if (!accompagnement) {
+                         Date patientEntry = newBedLocked.getBedLocked_PlannedUnxTmBgn();
+                         Date patientExit = newBedLocked.getBedLocked_PlannedUnxTmEnd();
+                         for (Bed abed : beds) {
+                             if (isBedInBedLocked(abed)) {
+                                 if (checkdates(abed, patientEntry, patientExit) && verifyGoodRoomCondition(abed, patientWeight)) {
+                                     assignPersonToBed(newBedLocked, abed);
+                                     return abed;
+                                 }
+                             } else if (!isBedInBedLocked(abed) && verifyGoodRoomCondition(abed, patientWeight)) {
+                                 assignPersonToBed(newBedLocked, abed);
+                                 return abed;
+                             }
+                         }
+                     }
+                 }
+
+                 ////////chambre COLLECTIVE////
+
+                 else if (room.getRoomType() == RoomType.COLLECTIVE) {
+                     Date patientEntry = newBedLocked.getBedLocked_PlannedUnxTmBgn();
+                     Date patientExit = newBedLocked.getBedLocked_PlannedUnxTmEnd();
+                     boolean bedFound = false;
+                     for (Bed bed : beds) {
+                         if (isBedInBedLocked(bed)) {
+                             if (checkdates(bed, patientEntry, patientExit) && verifyGoodRoomCondition(bed, patientWeight)) {
+                                 assignPersonToBed(newBedLocked, bed);
+                                 bedFound = true;
+                                 return bed;
+                             }
+                         } else if (!isBedInBedLocked(bed) && verifyGoodRoomCondition(bed, patientWeight)) {
+                             assignPersonToBed(newBedLocked, bed);
+                             bedFound = true;
+                             return bed;
+                         }
+                     }
+                     if (!bedFound) {
+                         throw new IllegalStateException("Aucun lit disponible avec les bons critères !");
+                     }
+                 }
+
+                 ////////chambre Simple////
+
+                 else if (room.getRoomType() == RoomType.Simple) {
+                     Date patientEntry = newBedLocked.getBedLocked_PlannedUnxTmBgn();
+                     Date patientExit = newBedLocked.getBedLocked_PlannedUnxTmEnd();
+                     boolean bedFound = false;
+                     for (Bed bed : beds) {
+                         if (isBedInBedLocked(bed)) {
+                             if (checkdates(bed, patientEntry, patientExit) && verifyGoodRoomCondition(bed, patientWeight)) {
+                                 assignPersonToBed(newBedLocked, bed);
+                                 bedFound = true;
+                                 return bed;
+                             }
+                         } else if (!isBedInBedLocked(bed) && verifyGoodRoomCondition(bed, patientWeight)) {
+                             assignPersonToBed(newBedLocked, bed);
+                             bedFound = true;
+                             return bed;
+                         }
+                     }
+                     if (!bedFound) {
+                         throw new IllegalStateException("Aucun lit disponible avec les bons critères !");
+                     }
+                 }
+
+                 else {
+                     if (!beds.isEmpty()) {
+                         assignPersonToFirstAvailableBed(newBedLocked, beds);
+                     } else {
+                         throw new IllegalStateException("Pas de lit disponible dans la chambre " + room.getRoomType());
+                     }
+                 }
+
+
+
+
+
+
+             }
+
+
+
+
+
+
+
+
+
+
+             else {
+                 throw new IllegalStateException("Chambre non trouvée avec l'ID: " + roomKey);
+             }
+
+
+
+         } catch (Exception e) {
+             throw new IllegalStateException(e.getMessage());
+         }
+         return null;
+     }
+ */
+   /* @Override
     public Bed changePatientBed(Integer roomKey, BedLocked newBedLocked, boolean accompagnement, double patientWeight) {
+
         try {
 
             bedLockedRepository.save(newBedLocked);
@@ -521,7 +666,9 @@ public class BedLockedImpl implements BedLockedService {
                             for (Bed abed : beds) {
                                 if (abed.getBedType() == BedType.Medicalise && newBedLocked.getBedLockedOccupantType() == OccupantType.Patient) {
                                     assignPersonToBed(newBedLocked, abed);
+
                                     return abed;
+
                                 }
                             }
                         } else if (simpleBedCount == 2) {
@@ -597,9 +744,7 @@ public class BedLockedImpl implements BedLockedService {
                     if (!bedFound) {
                         throw new IllegalStateException("Aucun lit disponible avec les bons critères !");
                     }
-                }
-
-                else {
+                } else {
                     if (!beds.isEmpty()) {
                         assignPersonToFirstAvailableBed(newBedLocked, beds);
                     } else {
@@ -608,61 +753,282 @@ public class BedLockedImpl implements BedLockedService {
                 }
 
 
-
-
-
-
-            }
-
-
-
-
-
-
-
-
-
-
-            else {
+            } else {
                 throw new IllegalStateException("Chambre non trouvée avec l'ID: " + roomKey);
             }
-
 
 
         } catch (Exception e) {
             throw new IllegalStateException(e.getMessage());
         }
         return null;
+    }*/
+
+@Override
+    public Bed changePatientBed(Integer roomKey, BedLocked newBedLocked, boolean accompagnement, double patientWeight,Integer commpanionKey) {
+
+    Bed patientBed=null;
+    try {
+
+        bedLockedRepository.save(newBedLocked);
+        Date EnterDate = newBedLocked.getBedLocked_PlannedUnxTmBgn();
+        Date ExitDate = newBedLocked.getBedLocked_PlannedUnxTmEnd();
+        Date realEntery = newBedLocked.getBedLocked_RealUnxTmBgn();
+        Date realExit = newBedLocked.getBedLocked_RealUnxTmEnd();
+
+        BedLocked companionBedLocked = new BedLocked();
+
+        Optional<Room> optionalRoom = roomRepository.findById(roomKey);
+        if (optionalRoom.isPresent()) {
+            Room room = optionalRoom.get();
+            List<Bed> beds = room.getRoomBed();
+            RoomCompanion roomCompanion;
+         //   Integer accompanionKey=null;
+            ////////chambre Double////
+            if (room.getRoomType() == RoomType.Double) {
+                if (accompagnement) {
+                    long simpleBedCount = 0;
+                    long medicalBedCount = 0;
+                    for (Bed abed : beds) {
+                        if (abed.getBedType() == BedType.Simple) {
+                            simpleBedCount++;
+                        } else if (abed.getBedType() == BedType.Medicalise) {
+                            medicalBedCount++;
+                        }
+                    }
+
+                    if (simpleBedCount == 1 && medicalBedCount == 1) {
+                        // Vérifie s'il y a un accompagnant
+
+
+
+                            for (Bed abed : beds) {
+                                if (abed.getBedType() == BedType.Medicalise && newBedLocked.getBedLockedOccupantType() == OccupantType.Patient) {
+                                    // Assigner le patient au lit médicalisé
+                                    assignPersonToBed(newBedLocked, abed);
+                                    patientBed = abed;
+                                } else if (abed.getBedType() == BedType.Simple && verifyGoodRoomCondition(abed, patientWeight)) {
+
+                                    if (commpanionKey != null) {
+                                        System.out.println("Companion Key " + commpanionKey);
+                                        Optional<RoomCompanion> companion = roomCompanionService.getCompanionById(commpanionKey);
+
+                                        if (companion.isPresent()) {
+
+                                            roomCompanion=companion.get();
+                                            System.out.println("L'accompagnant est "+roomCompanion);
+                                            // Vérifier les dates et affecter l'accompagnant au lit simple
+                                            companionBedLocked.setBedLockedOccupantKy(commpanionKey);
+                                            companionBedLocked.setBedLocked_PlannedUnxTmBgn(EnterDate);
+                                            companionBedLocked.setBedLocked_PlannedUnxTmEnd(ExitDate);
+                                            companionBedLocked.setBedLocked_RealUnxTmBgn(realEntery);
+                                            companionBedLocked.setBedLocked_RealUnxTmEnd(realExit);
+                                            companionBedLocked.setBed(abed);
+                                            companionBedLocked.setBedLockedOccupantType(OccupantType.Accompagnant);
+                                            assignPersonToBed(companionBedLocked, abed);
+                                            System.out.println("companionnn beddd"+abed);
+                                            bedLockedRepository.save(companionBedLocked);
+                                            System.out.println(companionBedLocked);
+
+
+                                        }else {
+                                            // S'il n'y a pas d'accompagnant, assigner le patient au lit médicalisé
+
+                                                if (abed.getBedType() == BedType.Medicalise && newBedLocked.getBedLockedOccupantType() == OccupantType.Patient) {
+                                                    assignPersonToBed(newBedLocked, abed);
+                                                    patientBed = abed;
+
+                                            }
+                                        }
+
+                                    }
+
+                                }
+                            }
+
+
+                    }
+
+
+                    else if (simpleBedCount == 2) {
+                        for (Bed abed : beds) {
+                            if (abed.getBedType() == BedType.Simple && newBedLocked.getBedLockedOccupantType() == OccupantType.Patient) {
+                                assignPersonToBed(newBedLocked, abed);
+                                patientBed = abed;
+
+                            }
+                        }
+                    } else {
+                        throw new IllegalStateException("La chambre double ne contient pas la configuration attendue de lits");
+                    }
+                } else if (!accompagnement) {
+                    Date patientEntry = newBedLocked.getBedLocked_PlannedUnxTmBgn();
+                    Date patientExit = newBedLocked.getBedLocked_PlannedUnxTmEnd();
+                    for (Bed abed : beds) {
+                        if (isBedInBedLocked(abed)) {
+                            if (checkdates(abed, patientEntry, patientExit) && verifyGoodRoomCondition(abed, patientWeight)) {
+                                assignPersonToBed(newBedLocked, abed);
+                                patientBed = abed;
+
+                            }
+                        } else if (!isBedInBedLocked(abed) && verifyGoodRoomCondition(abed, patientWeight)) {
+                            assignPersonToBed(newBedLocked, abed);
+                            patientBed = abed;
+
+                        }
+                    }
+                }
+            }
+
+            ////////chambre COLLECTIVE////
+
+            else if (room.getRoomType() == RoomType.COLLECTIVE) {
+                Date patientEntry = newBedLocked.getBedLocked_PlannedUnxTmBgn();
+                Date patientExit = newBedLocked.getBedLocked_PlannedUnxTmEnd();
+                boolean bedFound = false;
+                for (Bed bed : beds) {
+                    if (isBedInBedLocked(bed)) {
+                        if (checkdates(bed, patientEntry, patientExit) && verifyGoodRoomCondition(bed, patientWeight)) {
+                            assignPersonToBed(newBedLocked, bed);
+                            bedFound = true;
+                            return bed;
+                        }
+                    } else if (!isBedInBedLocked(bed) && verifyGoodRoomCondition(bed, patientWeight)) {
+                        assignPersonToBed(newBedLocked, bed);
+                        bedFound = true;
+                        return bed;
+                    }
+                }
+                if (!bedFound) {
+                    throw new IllegalStateException("Aucun lit disponible avec les bons critères !");
+                }
+            }
+
+            ////////chambre Simple////
+
+            else if (room.getRoomType() == RoomType.Simple) {
+                Date patientEntry = newBedLocked.getBedLocked_PlannedUnxTmBgn();
+                Date patientExit = newBedLocked.getBedLocked_PlannedUnxTmEnd();
+                boolean bedFound = false;
+                for (Bed bed : beds) {
+                    if (isBedInBedLocked(bed)) {
+                        if (checkdates(bed, patientEntry, patientExit) && verifyGoodRoomCondition(bed, patientWeight)) {
+                            assignPersonToBed(newBedLocked, bed);
+                            bedFound = true;
+                            patientBed = bed;
+
+                        }
+                    } else if (!isBedInBedLocked(bed) && verifyGoodRoomCondition(bed, patientWeight)) {
+                        assignPersonToBed(newBedLocked, bed);
+                        bedFound = true;
+                        patientBed = bed;
+
+                    }
+                }
+                if (!bedFound) {
+                    throw new IllegalStateException("Aucun lit disponible avec les bons critères !");
+                }
+            } else {
+                if (!beds.isEmpty()) {
+                    assignPersonToFirstAvailableBed(newBedLocked, beds);
+                } else {
+                    throw new IllegalStateException("Pas de lit disponible dans la chambre " + room.getRoomType());
+                }
+            }
+
+
+        } else {
+            throw new IllegalStateException("Chambre non trouvée avec l'ID: " + roomKey);
+        }
+
+
+    } catch (Exception e) {
+        throw new IllegalStateException(e.getMessage());
     }
+    return patientBed;
+}
+
+
 
 
     @Override
 
-public Room getPatientRoom(Integer patientKey) {
-    BedLocked bedLocked = bedLockedRepository.findByBedLockedOccupantKyAndAndBedLockedOccupantType(patientKey, OccupantType.Patient);
-    if (bedLocked != null) {
-        Bed bed = bedLocked.getBed();
-        if (bed != null) {
-            return bed.getRoomBed();
+    public Room getPatientRoom(Integer patientKey) {
+        BedLocked bedLocked = bedLockedRepository.findByBedLockedOccupantKyAndAndBedLockedOccupantType(patientKey, OccupantType.Patient);
+        if (bedLocked != null) {
+            Bed bed = bedLocked.getBed();
+            if (bed != null) {
+                return bed.getRoomBed();
+            } else {
+                // Gérer le cas où le lit n'est pas trouvé
+                throw new RuntimeException("Le lit du patient n'a pas été trouvé.");
+            }
         } else {
-            // Gérer le cas où le lit n'est pas trouvé
-            throw new RuntimeException("Le lit du patient n'a pas été trouvé.");
+            // Gérer le cas où le patient n'est pas trouvé dans un lit
+            throw new RuntimeException("Le patient n'est pas logé dans un lit.");
         }
-    } else {
-        // Gérer le cas où le patient n'est pas trouvé dans un lit
-        throw new RuntimeException("Le patient n'est pas logé dans un lit.");
     }
-}
+
+
+    @Override
+    public BedLocked getBedLockedcompanion(Integer comapnionKey) {
+        return bedLockedRepository.findByBedLockedOccupantKyAndAndBedLockedOccupantType(comapnionKey, OccupantType.Accompagnant);
+    }
+
+    @Override
+    public Bed getBedbyType(BedType type) {
+        return (Bed) bedRespository.findByBedType(type);
+    }
+
+    @Override
+    public boolean checkAccompagnant(Integer patientKey) {
+        BedLocked abedLocked = bedLockedRepository.findByBedLockedOccupantKyAndAndBedLockedOccupantType(patientKey, OccupantType.Patient);
+        Bed aBed = abedLocked.getBed();
+        Room aRoom = aBed.getRoomBed();
+
+        if (aRoom.getRoomType() == RoomType.Double) {
+            for (Bed beed : aRoom.getRoomBed()) {
+                if (beed.getBedType() == BedType.Simple) {
+                    Integer bedKey = beed.getBedKey();
+                    BedLocked abedlockedcompanion = bedLockedRepository.findByBed_BedKey(bedKey);
+                    if (abedlockedcompanion != null) {
+                        if (abedlockedcompanion.getBedLockedOccupantType() == OccupantType.Accompagnant) {
+                            return true;
+                        }
+                    }
+                }
+
+            }
+        }
+        return false;
+    }
+
+
+    @Override
+    public Integer getAccompagnat(Integer patientKey) {
+        BedLocked abedLocked = bedLockedRepository.findByBedLockedOccupantKyAndAndBedLockedOccupantType(patientKey, OccupantType.Patient);
+        Bed aBed = abedLocked.getBed();
+        Room aRoom = aBed.getRoomBed();
+
+        if (aRoom.getRoomType() == RoomType.Double) {
+            for (Bed beed : aRoom.getRoomBed()) {
+                if (beed.getBedType() == BedType.Simple) {
+                    Integer bedKey = beed.getBedKey();
+                    BedLocked abedlockedcompanion = bedLockedRepository.findByBed_BedKey(bedKey);
+                    if (abedlockedcompanion != null) {
+                        if (abedlockedcompanion.getBedLockedOccupantType() == OccupantType.Accompagnant) {
+                            return abedlockedcompanion.getBedLockedOccupantKy();
+                        }
+                    }
+                }
+
+            }
+        }
+       return null;
+    }
+
 
 }
-
-
-
-
-
-
-
-
 
 
 

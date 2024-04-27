@@ -2,8 +2,8 @@ package com.core.patient.entities.enumeration;
 
 public enum BloodPressure {
     Normal("Normal"),
-    Low("Normal"),
-    High("High");
+    Low("Low"),
+    High("High ");
 
 
     private final String displayName;

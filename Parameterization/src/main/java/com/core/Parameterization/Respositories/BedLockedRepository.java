@@ -22,4 +22,6 @@ public interface BedLockedRepository extends JpaRepository<BedLocked,Integer> {
 
     BedLocked findByBedLockedOccupantKy(Integer bedLocked);
     BedLocked findByBedLockedOccupantKyAndAndBedLockedOccupantType(Integer bedLockedKy,OccupantType occupantType);
+    BedLocked findByBed_BedKey(Integer bedKey);
+
 }

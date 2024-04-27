@@ -80,4 +80,20 @@ public class RoomCompanion {
     public void setRoomCompanion_Remarque(String roomCompanion_Remarque) {
         this.roomCompanion_Remarque = roomCompanion_Remarque;
     }
+
+    public void setRoomCompanionKy(Integer roomCompanionKy) {
+        this.roomCompanionKy = roomCompanionKy;
+    }
+
+    @Override
+    public String toString() {
+        return "RoomCompanion{" +
+                "roomCompanionKy=" + roomCompanionKy +
+                ", roomCompanionName='" + roomCompanionName + '\'' +
+                ", roomCompanionFirstName='" + roomCompanionFirstName + '\'' +
+                ", roomCompanionBirthDate=" + roomCompanionBirthDate +
+                ", roomCompanionRelation=" + roomCompanionRelation +
+                ", roomCompanion_Remarque='" + roomCompanion_Remarque + '\'' +
+                '}';
+    }
 }

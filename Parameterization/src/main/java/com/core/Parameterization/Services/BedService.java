@@ -33,5 +33,4 @@ void saveBed(Bed iBed);
     Bed isPatientAssignedToBed(Integer patientId);
 
 
-
 }

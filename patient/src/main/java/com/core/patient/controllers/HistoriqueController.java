@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/historique")
@@ -26,8 +28,8 @@ public class HistoriqueController {
         }
     }
     @GetMapping("/getPatientHistory/{patientkey}")
-    public ResponseEntity<Historique> getPatientHistory(@PathVariable("patientkey") Integer patientKey) {
-        Historique historique = historqueService.getHisory(patientKey);
+    public ResponseEntity<List<Historique>> getPatientHistory(@PathVariable("patientkey") Integer patientKey) {
+        List<Historique> historique = historqueService.getHisory(patientKey);
         if (historique != null) {
             return ResponseEntity.ok().body(historique);
         } else {

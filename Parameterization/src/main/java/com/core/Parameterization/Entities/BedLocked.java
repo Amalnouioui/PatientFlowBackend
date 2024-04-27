@@ -30,17 +30,17 @@ public class BedLocked {
     @Enumerated(EnumType.STRING)
     @Column(name = "BedLocked_OccupantType",nullable=false)
     private OccupantType bedLockedOccupantType;
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     @Column(name = "BedLocked_PlannedUnxTmBgn" )
     private Date bedLocked_PlannedUnxTmBgn;
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     @Column(name = "BedLocked_PlannedUnxTmEnd")
     private Date bedLocked_PlannedUnxTmEnd;
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     @Column(name = "BedLocked_RealUnxTmBgn")
     private Date bedLocked_RealUnxTmBgn;
 
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     @Column(name = "BedLocked_RealUnxTmEnd")
     private Date bedLocked_RealUnxTmEnd;
 
@@ -117,5 +117,17 @@ public class BedLocked {
         this.bedLocked_RealUnxTmEnd = bedLocked_RealUnxTmEnd;
     }
 
-
+    @Override
+    public String toString() {
+        return "BedLocked{" +
+                "bedLockedKy=" + bedLockedKy +
+                ", bedLockedOccupantKy=" + bedLockedOccupantKy +
+                ", bedLockedOccupantType=" + bedLockedOccupantType +
+                ", bedLocked_PlannedUnxTmBgn=" + bedLocked_PlannedUnxTmBgn +
+                ", bedLocked_PlannedUnxTmEnd=" + bedLocked_PlannedUnxTmEnd +
+                ", bedLocked_RealUnxTmBgn=" + bedLocked_RealUnxTmBgn +
+                ", bedLocked_RealUnxTmEnd=" + bedLocked_RealUnxTmEnd +
+                ", bed=" + bed +
+                '}';
+    }
 }

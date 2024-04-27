@@ -1,13 +1,15 @@
 package com.core.patient.entities;
 
-import com.core.patient.entities.enumeration.*;
+import com.core.patient.entities.enumeration.Gender;
+import com.core.patient.entities.enumeration.IdentityType;
+import com.core.patient.entities.enumeration.Nationality;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -16,26 +18,24 @@ import java.util.Set;
 @Entity
 @Table(name = "Doctor")
 public class Doctor {
-
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "Patient_Key", nullable = false, unique = true)
-    private int doctorKey;
+    @Column(name = "doctor_Key", nullable = false, unique = true)
+    private Integer doctorKey;
 
-    @Column(name = "Patient_FirstName", nullable = false)
-    private String doctorFirtName;
+    @Column(name = "doctor_FirstName", nullable = false)
+    private String doctorFirstName;
 
-    @Column(name = "Patient_LastName", nullable = false)
+    @Column(name = "doctor_LastName", nullable = false)
     private String doctorLastName;
 
-    @Column(name = "Patient_BirthDate")
-    private Date patientBirthDate;
+    @Column(name = "doctor_BirthDate")
+    private Date doctorBirthDate;
 
 
 
-    @Column(name = "Patient_IdentityNumber",unique = true)
-    private String doctorIdentity;
+    @Column(name = "doctor_IdentityNumber",unique = true)
+    private String doctorIdentityNumber;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "identity")
@@ -47,117 +47,12 @@ public class Doctor {
 
     @Column(name = "adress")
     private String adress;
-
-    @Column(name = "email",unique = true)
+    @Column(name = "Email")
     private String email;
-
-    @Column(name = "phone",unique = true)
-    private String phone;
-
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "country")
-    private Country country;
+    // @JsonIgnore
+    @Getter
+    @OneToMany(mappedBy = "doctor",cascade = CascadeType.ALL,orphanRemoval = true)
+    private Set<Rapport> rapportset;
 
 
-
-
-    @OneToMany(mappedBy = "doctor",cascade = CascadeType.ALL)
-    Set<Rapport> rapportSet;
-
-    public int getDoctorKey() {
-        return doctorKey;
-    }
-
-    public void setDoctorKey(int doctorKey) {
-        this.doctorKey = doctorKey;
-    }
-
-    public String getDoctorFirtName() {
-        return doctorFirtName;
-    }
-
-    public void setDoctorFirtName(String doctorFirtName) {
-        this.doctorFirtName = doctorFirtName;
-    }
-
-    public String getDoctorLastName() {
-        return doctorLastName;
-    }
-
-    public void setDoctorLastName(String doctorLastName) {
-        this.doctorLastName = doctorLastName;
-    }
-
-    public Date getPatientBirthDate() {
-        return patientBirthDate;
-    }
-
-    public void setPatientBirthDate(Date patientBirthDate) {
-        this.patientBirthDate = patientBirthDate;
-    }
-
-    public String getDoctorIdentity() {
-        return doctorIdentity;
-    }
-
-    public void setDoctorIdentity(String doctorIdentity) {
-        this.doctorIdentity = doctorIdentity;
-    }
-
-    public IdentityType getIdentity() {
-        return identity;
-    }
-
-    public void setIdentity(IdentityType identity) {
-        this.identity = identity;
-    }
-
-    public Nationality getPatientNationality() {
-        return patientNationality;
-    }
-
-    public void setPatientNationality(Nationality patientNationality) {
-        this.patientNationality = patientNationality;
-    }
-
-    public String getAdress() {
-        return adress;
-    }
-
-    public void setAdress(String adress) {
-        this.adress = adress;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public Country getCountry() {
-        return country;
-    }
-
-    public void setCountry(Country country) {
-        this.country = country;
-    }
-
-    public Set<Rapport> getRapportSet() {
-        return rapportSet;
-    }
-
-    public void setRapportSet(Set<Rapport> rapportSet) {
-        this.rapportSet = rapportSet;
-    }
 }

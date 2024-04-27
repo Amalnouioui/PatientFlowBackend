@@ -6,6 +6,8 @@ import java.util.Optional;
 
 import com.core.patient.entities.Patient;
 import com.core.patient.entities.enumeration.Gender;
+import org.springframework.stereotype.Service;
+
 
 public interface PatientService {
 	 	List<Patient> getAllPatients();

@@ -395,13 +395,14 @@ import java.util.*;
 
                     }
                 }
-                System.out.println(checkdates(aBed, bedLocked_PlannedUnxTmBgn, bedLocked_PlannedUnxTmEnd));
+                System.out.println("reservation de litt :"+checkdates(aBed, bedLocked_PlannedUnxTmBgn, bedLocked_PlannedUnxTmEnd));
             }
 
             if (roomType == RoomType.Double) {
-                if ((simpleBedCount == 2 || (simpleBedCount == 1 && medicalBedCount == 1)) && isGoodOrNeedsMinorRepair && isPerfectWeight && isNotReserved && accompagnement) {
+                if ((simpleBedCount == 2 || (simpleBedCount == 1 && medicalBedCount == 1)) && isGoodOrNeedsMinorRepair && isPerfectWeight && isNotReserved && (accompagnement) ) {
                     filteredRooms.add(aRoom);
-                } else if (!accompagnement) {
+                } else if (!accompagnement ) {
+
                     boolean isValidRoom = false;
                     for (Bed aBed : aRoom.getRoomBed()) {
                         if (verifyGoodRoomCondition(aBed, patientWeight) && isNotReserved) {

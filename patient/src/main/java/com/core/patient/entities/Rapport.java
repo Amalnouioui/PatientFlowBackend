@@ -1,134 +1,58 @@
 package com.core.patient.entities;
 
 import com.core.patient.entities.enumeration.BloodPressure;
+import com.core.patient.entities.enumeration.Gender;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.Date;
 
-@AllArgsConstructor
 @NoArgsConstructor
-@Data
+@AllArgsConstructor
 @Entity
+@Table(name="Rapport")
+@Getter
+@Setter
 public class Rapport {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "rapport_Key", nullable = false, unique = true)
     private int rapportKey;
 
-
-    @Column(name = "Rapport_Date")
-    private Date rapportDate;
-
-
-
-
-    @Column(name="Disease", nullable=false)
+    @Column(name = "disease", nullable = false)
     private String disease;
 
-    @Column(name="Fever", nullable=false)
+    @Column(name = "fever", nullable = false)
     private boolean fever;
-
-    @Column(name="Cough", nullable=false)
+    @Column(name = "Cough", nullable = false)
     private boolean Cough;
-
-    @Column(name="Fatigue", nullable=false)
+    @Column(name = "fatigue", nullable = false)
     private boolean fatigue;
 
-    @Column(name="bloodPressure", nullable=false)
+    @Column(name = "rapportDate")
+    private Date rapportDate;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "bloodPressure")
     private BloodPressure bloodPressure;
-
-    @Column(name="Cholesterol", nullable=false)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "cholesterol")
     private BloodPressure cholesterol;
+    @Column(name = "remarque", nullable = false)
+    private String remarque;
+
+
+@JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "Doctor_ref")
-
-    private Doctor doctor;
-
+    @JoinColumn(name = "patient_ref")
+    private Patient patient ;
+    @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "Patient_ref")
+    @JoinColumn(name = "doctor_ref")
+    private Doctor doctor ;
 
-    private Patient patient;
-
-    public int getRapportKey() {
-        return rapportKey;
-    }
-
-    public void setRapportKey(int rapportKey) {
-        this.rapportKey = rapportKey;
-    }
-
-    public Date getRapportDate() {
-        return rapportDate;
-    }
-
-    public void setRapportDate(Date rapportDate) {
-        this.rapportDate = rapportDate;
-    }
-
-    public String getDisease() {
-        return disease;
-    }
-
-    public void setDisease(String disease) {
-        this.disease = disease;
-    }
-
-    public boolean isFever() {
-        return fever;
-    }
-
-    public void setFever(boolean fever) {
-        this.fever = fever;
-    }
-
-    public boolean isCough() {
-        return Cough;
-    }
-
-    public void setCough(boolean cough) {
-        Cough = cough;
-    }
-
-    public boolean isFatigue() {
-        return fatigue;
-    }
-
-    public void setFatigue(boolean fatigue) {
-        this.fatigue = fatigue;
-    }
-
-    public BloodPressure getBloodPressure() {
-        return bloodPressure;
-    }
-
-    public void setBloodPressure(BloodPressure bloodPressure) {
-        this.bloodPressure = bloodPressure;
-    }
-
-    public BloodPressure getCholesterol() {
-        return cholesterol;
-    }
-
-    public void setCholesterol(BloodPressure cholesterol) {
-        this.cholesterol = cholesterol;
-    }
-
-    public Doctor getDoctor() {
-        return doctor;
-    }
-
-    public void setDoctor(Doctor doctor) {
-        this.doctor = doctor;
-    }
-
-    public Patient getPatient() {
-        return patient;
-    }
-
-    public void setPatient(Patient patient) {
-        this.patient = patient;
-    }
 }

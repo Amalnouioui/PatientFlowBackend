@@ -5,9 +5,9 @@ import com.core.patient.entities.Rapport;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import java.util.List;
 
 @Repository
 public interface RapportRepository extends JpaRepository<Rapport,Integer> {
-    Optional<Rapport> findByPatient(Patient patient);
+    List<Rapport> findByPatient(Patient patient);
 }

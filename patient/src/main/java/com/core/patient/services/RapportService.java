@@ -1,12 +1,13 @@
 package com.core.patient.services;
 
 import com.core.patient.entities.Rapport;
-import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.List;
 
-@Service
 public interface RapportService {
-    void crateRapport(Rapport rapport);
-    Optional<Rapport> geRapportyPatientKey(Integer patientKey);
+  List<Rapport> getRapport(Integer patientKey);
+  void createRapport(Rapport rapport);
+  void updatedRapport(Integer rapportKey,Rapport rapport);
+  Rapport getById(Integer rapportKey);
+  void deleteRapport(Integer rapportKey);
 }

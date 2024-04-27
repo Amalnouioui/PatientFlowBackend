@@ -120,5 +120,18 @@ public class Room {
         this.roomBed = roomBed;
     }
 
-
+    @Override
+    public String toString() {
+        return "Room{" +
+                "roomKey=" + roomKey +
+                ", roomName=" + roomName +
+                ", roomType=" + roomType +
+                ", roomStatue=" + roomStatue +
+                ", roomCapacity=" + roomCapacity +
+                ", cleaningState=" + cleaningState +
+                ", roomResponsible='" + roomResponsible + '\'' +
+                ", careunitRoom=" + careunitRoom +
+                ", roomBed=" + roomBed +
+                '}';
+    }
 }

@@ -28,10 +28,10 @@ public class Historique {
 
 
     @Column(name = "old_Careunit")
-    private String OldCareUnit;
+    private String oldCareUnit;
 
     @Column(name = "New_CareUnit")
-    private String NewCareUnit;
+    private String newCareUnit;
 
 
     @Column(name = "Old_Bed")
@@ -46,10 +46,10 @@ public class Historique {
     @Column(name = "New_Room")
     private Integer newRoom;
 
-@JsonIgnore
+
     @ManyToOne
     @JoinColumn(name = "patient_ref", referencedColumnName = "Patient_Key")
-   // @JsonIdentityReference(alwaysAsId = true)
+    @JsonIdentityReference(alwaysAsId = true)
     private  Patient patient;
 
     public Integer getHistoriquekey() {
@@ -69,21 +69,20 @@ public class Historique {
     }
 
     public String getOldCareUnit() {
-        return OldCareUnit;
+        return oldCareUnit;
     }
 
     public void setOldCareUnit(String oldCareUnit) {
-        OldCareUnit = oldCareUnit;
+        this.oldCareUnit = oldCareUnit;
     }
 
     public String getNewCareUnit() {
-        return NewCareUnit;
+        return newCareUnit;
     }
 
     public void setNewCareUnit(String newCareUnit) {
-        NewCareUnit = newCareUnit;
+        this.newCareUnit = newCareUnit;
     }
-
 
     public Integer getOldBed() {
         return oldBed;
