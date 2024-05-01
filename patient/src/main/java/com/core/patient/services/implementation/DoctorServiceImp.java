@@ -3,6 +3,7 @@ package com.core.patient.services.implementation;
 import com.core.patient.entities.Doctor;
 import com.core.patient.repositories.DoctorRepository;
 import com.core.patient.services.DoctorService;
+import io.micrometer.observation.annotation.Observed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,5 +20,9 @@ public class DoctorServiceImp  implements DoctorService {
             return OptionalDoctor.get();
         }
         throw new IllegalStateException("Aucun doctor avec cet ID");
+    }
+    @Observed
+    public void createDoctor(Doctor doctor){
+        doctorRepository.save(doctor);
     }
 }

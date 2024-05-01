@@ -1,8 +1,6 @@
 package com.core.patient.entities;
 
-import com.core.patient.entities.enumeration.*;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -11,18 +9,18 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name="Historique")
+@Table(name="deplacmenet")
 
-public class Historique {
+public class Transfer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "historique_key", nullable = false, unique = true)
-    private Integer historiquekey;
+    @Column(name = "Transfer_Ky", nullable = false, unique = true)
+    private Integer transferKy;
 
 
 
-    @Column(name = "Patient_placementDate")
+    @Column(name = "Transfer_DateTime")
     private Date placementDate;
 
 
@@ -35,10 +33,10 @@ public class Historique {
 
 
     @Column(name = "Old_Bed")
-    private Integer oldBed;
+    private Integer Transfer_OldBedKy;
 
     @Column(name = "New_Bed")
-    private Integer newBed;
+    private Integer Transfer_NewBedKy;
 
     @Column(name = "Old_Room")
     private Integer oldRoom;
@@ -48,16 +46,21 @@ public class Historique {
 
 
     @ManyToOne
-    @JoinColumn(name = "patient_ref", referencedColumnName = "Patient_Key")
+    @JoinColumn(name = "Transfer_PatientKy", referencedColumnName = "Patient_Key")
     @JsonIdentityReference(alwaysAsId = true)
     private  Patient patient;
 
-    public Integer getHistoriquekey() {
-        return historiquekey;
+
+    @ManyToOne
+    @JoinColumn(name = "Transfer_PatientKy", referencedColumnName = "Bed_Key")
+    @JsonIdentityReference(alwaysAsId = true)
+    private  Patient patient;
+    public Integer getDeplacmentKy() {
+        return deplacmentKy;
     }
 
-    public void setHistoriquekey(Integer historiquekey) {
-        this.historiquekey = historiquekey;
+    public void setDeplacmentKy(Integer deplacmentKy) {
+        this.deplacmentKy = deplacmentKy;
     }
 
     public Date getPlacementDate() {
@@ -112,10 +115,6 @@ public class Historique {
         return newRoom;
     }
 
-    public void setNewRoom(Integer newRoom) {
-        this.newRoom = newRoom;
-    }
-
     public Patient getPatient() {
         return patient;
     }
@@ -123,4 +122,10 @@ public class Historique {
     public void setPatient(Patient patient) {
         this.patient = patient;
     }
+
+    public void setNewRoom(Integer newRoom) {
+        this.newRoom = newRoom;
+    }
+
+
 }

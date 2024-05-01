@@ -1,24 +1,16 @@
 package com.core.patient.entities;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-
-
-import com.core.patient.entities.enumeration.Country;
-import com.core.patient.entities.enumeration.Gender;
-import com.core.patient.entities.enumeration.IdentityType;
-import com.core.patient.entities.enumeration.Nationality;
-import com.core.patient.entities.enumeration.SocialStatus;
-
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.core.patient.entities.enumeration.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -85,14 +77,22 @@ public class Patient {
 
 
     @JsonIgnore
-    @OneToMany(mappedBy = "patient",cascade = CascadeType.ALL,orphanRemoval = true)
-    private List<Historique> historiques;
+    @OneToMany(mappedBy = "patient")
+    private List<Transfer> deplacementHistories;
 
    // @JsonIgnore
     @Getter
     @OneToMany(mappedBy = "patient",cascade = CascadeType.ALL,orphanRemoval = true)
     private Set<Rapport>rapportset;
 
+    @Getter
+    @OneToMany(mappedBy = "patient",cascade = CascadeType.ALL,orphanRemoval = true)
+    private Set<Consultation>consultations;
+
+
+   @JsonIgnore
+    @OneToMany(mappedBy = "patient")
+    private List<Admission_History> admissionHistories;
 
 
 

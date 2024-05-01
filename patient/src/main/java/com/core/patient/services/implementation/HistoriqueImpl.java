@@ -1,6 +1,6 @@
 package com.core.patient.services.implementation;
 
-import com.core.patient.entities.Historique;
+import com.core.patient.entities.Transfer;
 import com.core.patient.entities.Patient;
 import com.core.patient.repositories.HistoriqueRepository;
 import com.core.patient.repositories.PatientRepository;
@@ -18,17 +18,17 @@ public class HistoriqueImpl implements HistorqueService {
     @Autowired
     private PatientRepository patientRepository;
     @Override
-   public  void createHistory(Historique historique){
-        historiqueRepository.save(historique);
+   public  void createHistory(Transfer transfer){
+        historiqueRepository.save(transfer);
 
     }
     @Override
-    public  List<Historique> getHisory(Integer patientKey){
+    public  List<Transfer> getHisory(Integer patientKey){
         Optional<Patient> patientOptional=patientRepository.findById(patientKey);
         if(patientOptional.isPresent()){
 
-             List<Historique> historique = historiqueRepository.findByPatient(patientOptional.get());
-             return historique;
+             List<Transfer> transfer = historiqueRepository.findByPatient(patientOptional.get());
+             return transfer;
 
         }
         throw new IllegalStateException("patient n'existe pas!") ;

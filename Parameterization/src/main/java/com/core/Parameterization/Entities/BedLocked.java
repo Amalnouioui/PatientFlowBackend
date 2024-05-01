@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
-import java.util.List;
 
 @Entity
 @Getter
@@ -44,8 +43,7 @@ public class BedLocked {
     @Column(name = "BedLocked_RealUnxTmEnd")
     private Date bedLocked_RealUnxTmEnd;
 
-  /*@OneToMany(mappedBy = "bed",cascade = CascadeType.ALL,orphanRemoval = true)
-  private List<Bed> beds;*/
+
 
     public Bed getBed() {
         return bed;

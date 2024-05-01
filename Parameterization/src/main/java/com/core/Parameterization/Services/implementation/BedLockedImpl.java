@@ -1,23 +1,20 @@
 package com.core.Parameterization.Services.implementation;
 
-import com.core.Parameterization.Entities.*;
+import com.core.Parameterization.Entities.Bed;
+import com.core.Parameterization.Entities.BedLocked;
 import com.core.Parameterization.Entities.Enumeration.*;
+import com.core.Parameterization.Entities.Room;
+import com.core.Parameterization.Entities.RoomCompanion;
 import com.core.Parameterization.Respositories.BedLockedRepository;
 import com.core.Parameterization.Respositories.BedRespository;
-import com.core.Parameterization.Respositories.RoomCompanionRepository;
 import com.core.Parameterization.Respositories.RoomRepository;
 import com.core.Parameterization.Services.BedLockedService;
 import com.core.Parameterization.Services.RoomCompanionService;
-import com.core.patient.entities.Historique;
-import com.core.patient.entities.Patient;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -479,10 +476,19 @@ public class BedLockedImpl implements BedLockedService {
     public void changePatientReakEnteryDate(Integer id, Date bedLocked_RealUnxTmBgn) {
         BedLocked aBedLockedOptional = bedLockedRepository.findByBedLockedOccupantKyAndAndBedLockedOccupantType(id, OccupantType.Patient);
         if (aBedLockedOptional != null) {
+            if(checkAccompagnant(id)){
+                Integer accompagnantKey=getAccompagnat(id);
+                BedLocked accompagnantBedLocked=bedLockedRepository.findByBedLockedOccupantKyAndAndBedLockedOccupantType(accompagnantKey,OccupantType.Accompagnant);
+                if(accompagnantBedLocked!=null){
+                    aBedLockedOptional.setBedLocked_RealUnxTmBgn(bedLocked_RealUnxTmBgn);
+                    accompagnantBedLocked.setBedLocked_RealUnxTmBgn(bedLocked_RealUnxTmBgn);
+                    bedLockedRepository.save(aBedLockedOptional);
+                }
+            }else {
 
-            aBedLockedOptional.setBedLocked_RealUnxTmBgn(bedLocked_RealUnxTmBgn);
-            bedLockedRepository.save(aBedLockedOptional);
-
+                aBedLockedOptional.setBedLocked_RealUnxTmBgn(bedLocked_RealUnxTmBgn);
+                bedLockedRepository.save(aBedLockedOptional);
+            }
         } else {
             throw new IllegalStateException("le patient n'existe pas");
         }
@@ -951,6 +957,11 @@ public class BedLockedImpl implements BedLockedService {
 
 
 
+
+
+
+
+
     @Override
 
     public Room getPatientRoom(Integer patientKey) {
@@ -1026,6 +1037,83 @@ public class BedLockedImpl implements BedLockedService {
         }
        return null;
     }
+
+
+
+    @Override
+
+    public  void libererPatientFromBed(Integer patientKey) {
+        BedLocked abedLocked = bedLockedRepository.findByBedLockedOccupantKyAndAndBedLockedOccupantType(patientKey, OccupantType.Patient);
+        if (abedLocked != null) {
+            Bed patientBed = abedLocked.getBed();
+            patientBed.setBedStatue(BedStatus.Disponible);
+            patientBed.setBedCleaningStatus(BedCleaningStatus.A_Nettoyer);
+
+            // Check if patient has an accompanying person
+            if (checkAccompagnant(patientKey)) {
+                Integer accompagnantKey = getAccompagnat(patientKey);
+                BedLocked accompagnantBedLocked = bedLockedRepository.findByBedLockedOccupantKyAndAndBedLockedOccupantType(accompagnantKey, OccupantType.Accompagnant);
+                if (accompagnantBedLocked != null) {
+                    Bed accompagnantBed = accompagnantBedLocked.getBed();
+                    accompagnantBed.setBedStatue(BedStatus.Disponible);
+                    accompagnantBed.setBedCleaningStatus(BedCleaningStatus.A_Nettoyer);
+                    bedLockedRepository.delete(accompagnantBedLocked);
+                }
+            }
+            // Delete the patient's bed lock entry
+            bedLockedRepository.delete(abedLocked);
+        } else {
+            throw new IllegalStateException("Le patient n'est pas associé à un lit");
+        }
+    }
+
+
+
+
+@Override
+    public  void  addRealExitDate(Integer id, Date bedLocked_RealUnxTmEnd){
+    BedLocked aBedLockedOptional = bedLockedRepository.findByBedLockedOccupantKyAndAndBedLockedOccupantType(id, OccupantType.Patient);
+    if (aBedLockedOptional != null) {
+        if(checkAccompagnant(id)){
+            Integer accompagnantKey=getAccompagnat(id);
+            BedLocked accompagnantBedLocked=bedLockedRepository.findByBedLockedOccupantKyAndAndBedLockedOccupantType(accompagnantKey,OccupantType.Accompagnant);
+            if(accompagnantBedLocked!=null){
+                aBedLockedOptional.setBedLocked_RealUnxTmBgn(bedLocked_RealUnxTmEnd);
+                accompagnantBedLocked.setBedLocked_RealUnxTmBgn(bedLocked_RealUnxTmEnd);
+                bedLockedRepository.save(aBedLockedOptional);
+            }
+        }else {
+
+            aBedLockedOptional.setBedLocked_RealUnxTmBgn(bedLocked_RealUnxTmEnd);
+            bedLockedRepository.save(aBedLockedOptional);
+        }
+    } else {
+        throw new IllegalStateException("le patient n'existe pas");
+    }
+
+}
+/*
+@Override
+public    void prolongation(Integer id, Date bedLocked_PlannedUnxTmEnd){
+ Date PlannedEnterDate;
+ Date PlannedExitDate;
+    BedLocked aBedLockedOptional = bedLockedRepository.findByBedLockedOccupantKyAndAndBedLockedOccupantType(id, OccupantType.Patient);
+    if (aBedLockedOptional != null) {
+        Bed bed=aBedLockedOptional.getBed();
+List<BedLocked >bedLockedList=bed.getBedLockeds();
+for(BedLocked bedLocked :bedLockedList){
+  PlannedEnterDate=bedLocked.getBedLocked_PlannedUnxTmBgn();
+  PlannedExitDate=bedLocked.getBedLocked_PlannedUnxTmEnd();
+  if(checkdates())
+
+}
+
+
+    }
+    }
+*/
+
+
 
 
 }

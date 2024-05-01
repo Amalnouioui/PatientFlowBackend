@@ -33,6 +33,10 @@ public class Rapport {
     @Column(name = "fatigue", nullable = false)
     private boolean fatigue;
 
+
+    @Column(name = "difficulty Breathing", nullable = false)
+    private boolean     difficulty_Breathing;
+
     @Column(name = "rapportDate")
     private Date rapportDate;
 

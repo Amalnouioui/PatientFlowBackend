@@ -1,6 +1,5 @@
 package com.core.patient.entities;
 
-import com.core.patient.entities.enumeration.Gender;
 import com.core.patient.entities.enumeration.IdentityType;
 import com.core.patient.entities.enumeration.Nationality;
 import jakarta.persistence.*;
@@ -53,6 +52,9 @@ public class Doctor {
     @Getter
     @OneToMany(mappedBy = "doctor",cascade = CascadeType.ALL,orphanRemoval = true)
     private Set<Rapport> rapportset;
+    @Getter
+    @OneToMany(mappedBy = "doctor",cascade = CascadeType.ALL,orphanRemoval = true)
+    private Set<Consultation> consultations;
 
 
 }

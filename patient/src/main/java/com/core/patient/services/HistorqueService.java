@@ -1,10 +1,10 @@
 package com.core.patient.services;
 
-import com.core.patient.entities.Historique;
+import com.core.patient.entities.Transfer;
 
 import java.util.List;
 
 public interface HistorqueService {
-    void createHistory(Historique historique);
-    List<Historique> getHisory(Integer patientKey);
+    void createHistory(Transfer transfer);
+    List<Transfer> getHisory(Integer patientKey);
 }

@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="MavenProjectsManager">
@@ -9,7 +8,14 @@
         <option value="$PROJECT_DIR$/config-server/pom.xml" />
         <option value="$PROJECT_DIR$/discovery-server/pom.xml" />
         <option value="$PROJECT_DIR$/Parameterization/pom.xml" />
+        <option value="$USER_HOME$/Desktop/backend-Authentification/iss4u-alpha-patient-flow-patient-flow-backend-41ea33ba6422/Authentification/pom.xml" />
+        <option value="$PROJECT_DIR$/Authentification/pom.xml" />
       </list>
+    </option>
+    <option name="ignoredFiles">
+      <set>
+        <option value="$USER_HOME$/Desktop/backend-Authentification/iss4u-alpha-patient-flow-patient-flow-backend-41ea33ba6422/Authentification/pom.xml" />
+      </set>
     </option>
   </component>
   <component name="PWA">

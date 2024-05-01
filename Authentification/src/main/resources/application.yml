@@ -1,0 +1,42 @@
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+
+server:
+  port: 8074
+spring:
+  main:
+    allow-circular-references: true
+  application:
+    name: Authentification
+  config:
+    import: optional:configserver:http://localhost:8888
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/authentification
+    username: root
+    password: root
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQLDialect
+  mail:
+     host: smtp.gmail.com
+     port: 587
+     username: safaa.ltifi123@gmail.com
+     password: bbkh hyvx tyrm ewwr
+
+      # Propriétés supplémentaires de la messagerie (optionnelles)
+     properties:
+       mail:
+         smtp:
+           auth: true
+           starttls:
+             enable: true
+    
+# Configuration du serveur de messagerie SMTP

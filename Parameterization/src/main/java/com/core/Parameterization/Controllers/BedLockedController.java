@@ -1,13 +1,15 @@
 package com.core.Parameterization.Controllers;
 
 import com.core.Parameterization.Entities.*;
-import com.core.Parameterization.Entities.Enumeration.*;
+import com.core.Parameterization.Entities.Enumeration.BedCleaningStatus;
+import com.core.Parameterization.Entities.Enumeration.BedStatus;
+import com.core.Parameterization.Entities.Enumeration.BedType;
+import com.core.Parameterization.Entities.Enumeration.RoomType;
 import com.core.Parameterization.Respositories.BedLockedRepository;
-import com.core.Parameterization.Respositories.RoomRepository;
 import com.core.Parameterization.Services.BedLockedService;
 import com.core.Parameterization.Services.RoomCompanionService;
 import com.core.Parameterization.Services.RoomService;
-import com.core.patient.entities.Historique;
+import com.core.patient.entities.Transfer;
 import com.core.patient.entities.Patient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -16,10 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -355,16 +354,16 @@ oldBed.setBedCleaningStatus(BedCleaningStatus.A_Nettoyer);
                         // Vérifie si le lit a été changé
                         if (newBed.getBedKey() != oldBed.getBedKey()) {
                             // Crée un objet Historique pour enregistrer le changement de lit
-                            Historique historique = new Historique();
-                            historique.setOldBed(oldBed.getBedNumber());
-                            historique.setNewBed(newBed.getBedKey());
-                            historique.setNewCareUnit(NewCareUnit.getCareunitName());
-                            historique.setOldCareUnit(oldCareunit.getCareunitName());
-                            historique.setNewRoom(NewRoom.getRoomKey());
-                            historique.setOldRoom(OldRoom.getRoomKey());
+                            Transfer transfer = new Transfer();
+                            transfer.setOldBed(oldBed.getBedNumber());
+                            transfer.setNewBed(newBed.getBedKey());
+                            transfer.setNewCareUnit(NewCareUnit.getCareunitName());
+                            transfer.setOldCareUnit(oldCareunit.getCareunitName());
+                            transfer.setNewRoom(NewRoom.getRoomKey());
+                            transfer.setOldRoom(OldRoom.getRoomKey());
 
                             Date date = new Date();
-                            historique.setPlacementDate(date);
+                            transfer.setPlacementDate(date);
                             Integer patientKey = newBedLocked.getBedLockedOccupantKy();
 
 
@@ -376,10 +375,10 @@ oldBed.setBedCleaningStatus(BedCleaningStatus.A_Nettoyer);
 
 
                             System.out.println(patient);
-                            historique.setPatient(patient);
+                            transfer.setPatient(patient);
 
 
-                            ResponseEntity<String> response = restTemplate.postForEntity(historySave, historique, String.class);
+                            ResponseEntity<String> response = restTemplate.postForEntity(historySave, transfer, String.class);
                             System.out.println(response);
                             if (response.getStatusCode() == HttpStatus.OK) {
                                 System.out.println("Historique enregistré avec succès.");
@@ -425,6 +424,50 @@ public boolean isAccompanied(@PathVariable("patientKey") Integer patientKey){
         public Integer getAccompanion (@PathVariable("patientKey") Integer patientKey){
     return  bedLockedService.getAccompagnat(patientKey);
 }
+
+
+
+
+@DeleteMapping("freePatient/{patientKey}")
+
+    public String libererPatient(@PathVariable("patientKey") Integer patientKey){
+        try {
+            bedLockedService.libererPatientFromBed(patientKey);
+            return ("le patient a été libérer avec succées ");
+        }catch(Exception e){
+            return ("un erreur servenu lors de liberation de patient "+e.getMessage());
+
+    }
+
+}
+
+
+
+    @PutMapping("dischage/{id}")
+    public String dischage(@PathVariable("id") Integer id, @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") Date bedLocked_RealUnxTmEnd) {
+
+
+        try {
+            bedLockedService.addRealExitDate(id,bedLocked_RealUnxTmEnd );
+            return("La date réelle de sortie a été modifier avec sucées !");
+        } catch (Exception e) {
+            return (e.getMessage());
+        }
+
+
+
+    }
+    /*
+@PutMapping("/prlongation/{id}")
+public String PatientProlonagation(@PathVariable("id") Integer id, @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") Date bedLocked_PlannedUnxTmEnd){
+        try{
+            bedLockedService.prolongation(id,bedLocked_PlannedUnxTmEnd);
+            return ("laduré d'hospitalisation du patient a été prlonger avec succés ");
+        }
+        catch(Exception e){
+            return ("un erreur servenu lors de prolongation"+e.getMessage());
+        }
+}*/
 
 }
 
